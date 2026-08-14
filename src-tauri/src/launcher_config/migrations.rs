@@ -6,6 +6,7 @@ use crate::launcher_config::models::AppearanceBackgroundConfig;
 
 // Migrate old built-in wallpaper choices to the new default preset.
 const LEGACY_BUILT_IN_BACKGROUNDS: &[&str] = &["%built-in:Jokull", "%built-in:GNLXC"];
+const LEGACY_SJMC_DISCOVER_ENDPOINT: &str = "https://mc.sjtu.cn/api-sjmcl/article";
 
 #[derive(Deserialize, Default)]
 #[serde(rename_all = "camelCase", default)]
@@ -65,6 +66,7 @@ where
         }
         _ => None,
       })
+      .filter(|(url, _)| url != LEGACY_SJMC_DISCOVER_ENDPOINT)
       .collect(),
   )
 }

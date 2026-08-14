@@ -26,6 +26,15 @@ fn main() {
   // Notify Cargo to auto re-run the build script if .env changes
   println!("cargo:rerun-if-changed=.env");
   println!("cargo:rerun-if-changed=.env.template");
+  println!("cargo:rerun-if-changed=tauri.conf.json");
+  println!("cargo:rerun-if-changed=tauri.windows.conf.json");
+  println!("cargo:rerun-if-changed=assets/icons/32x32.png");
+  println!("cargo:rerun-if-changed=assets/icons/64x64.png");
+  println!("cargo:rerun-if-changed=assets/icons/128x128.png");
+  println!("cargo:rerun-if-changed=assets/icons/128x128@2x.png");
+  println!("cargo:rerun-if-changed=assets/icons/icon.png");
+  println!("cargo:rerun-if-changed=assets/icons/icon.ico");
+  println!("cargo:rerun-if-changed=assets/icons/icon.icns");
 
   tauri_build::build()
 }
