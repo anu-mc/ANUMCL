@@ -65,11 +65,11 @@
       "settings": {
         "copyright": {
           "title": "Copyright",
-          "description": "Copyright © 2024-2026 SJMCL Team."
+          "description": "Copyright © 2024-2026 ANU-MC and SJMCL contributors."
         },
         "userAgreement": {
           "title": "User Agreement",
-          "url": "https://mc.sjtu.cn/sjmcl/en/docs/tos"
+          "url": "https://github.com/anu-mc/ANUMCL/blob/main/docs/USER_AGREEMENT.md"
         },
         "openSourceLicense": {
           "title": "Open Source License",
@@ -3227,11 +3227,11 @@
       "title": "Welcome!"
     },
     "body": {
-      "text": "Welcome to SJMCL! Before you start, please be sure to read and agree to our <terms>User Agreement</terms>."
+      "text": "Welcome to ANUMCL! Before you start, please be sure to read and agree to our <terms>User Agreement</terms>."
     },
     "warning": {
-      "unstableVersion": "You are using the {{versionLabel}} of SJMCL. Some features may be unstable or incomplete. Bug reports and feature requests are welcome.",
-      "winArm64Notice": "SJMCL now supports Windows on Arm. If you are using a <b>QUALCOMM</b> platform, you may need to install the <glpack>OpenGL Compatibility Pack</glpack> before launching the game."
+      "unstableVersion": "You are using the {{versionLabel}} of ANUMCL. Some features may be unstable or incomplete. Bug reports and feature requests are welcome.",
+      "winArm64Notice": "ANUMCL now supports Windows on Arm. If you are using a <b>QUALCOMM</b> platform, you may need to install the <glpack>OpenGL Compatibility Pack</glpack> before launching the game."
     },
     "button": {
       "agree": "Agree"

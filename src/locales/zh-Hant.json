@@ -65,11 +65,11 @@
       "settings": {
         "copyright": {
           "title": "版權",
-          "description": "版權所有 © 2024-2026 SJMCL 開發團隊."
+          "description": "版權所有 © 2024-2026 ANU-MC 與 SJMCL 貢獻者."
         },
         "userAgreement": {
           "title": "使用者協議",
-          "url": "https://mc.sjtu.cn/sjmcl/docs/tos"
+          "url": "https://github.com/anu-mc/ANUMCL/blob/main/docs/USER_AGREEMENT.md"
         },
         "openSourceLicense": {
           "title": "開源協議",
@@ -3227,11 +3227,11 @@
       "title": "歡迎！"
     },
     "body": {
-      "text": "歡迎使用 SJMCL！在開始使用之前，請務必閱讀並同意我們的<terms>使用者協議</terms>。"
+      "text": "歡迎使用 ANUMCL！在開始使用之前，請務必閱讀並同意我們的<terms>使用者協議</terms>。"
     },
     "warning": {
-      "unstableVersion": "您正在使用{{versionLabel}}的 SJMCL，部分功能可能不穩定或未開發完成，歡迎報告使用問題與功能建議。",
-      "winArm64Notice": "SJMCL 現已支援 Windows on Arm 平臺。<br/>如您正在使用 <b>高通</b> 平臺，您可能需要安裝 <glpack>OpenGL 相容包</glpack> 後才能進行遊戲。"
+      "unstableVersion": "您正在使用{{versionLabel}}的 ANUMCL，部分功能可能不穩定或未開發完成，歡迎報告使用問題與功能建議。",
+      "winArm64Notice": "ANUMCL 現已支援 Windows on Arm 平臺。<br/>如您正在使用 <b>高通</b> 平臺，您可能需要安裝 <glpack>OpenGL 相容包</glpack> 後才能進行遊戲。"
     },
     "button": {
       "agree": "同意並繼續"

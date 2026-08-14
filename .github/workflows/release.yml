@@ -104,7 +104,7 @@ jobs:
           merge-multiple: true
 
       - name: Download signed macOS artifacts
-        if: needs.Code-Sign-macOS.result == 'success'
+        if: needs.Code-Sign-macOS.outputs.signed == 'true'
         uses: actions/download-artifact@v4
         with:
           pattern: 'ANUMCL_${{ needs.Version-Check.outputs.version }}_macos_*_signed'
@@ -114,7 +114,7 @@ jobs:
       - name: Organize release artifacts
         env:
           VERSION: ${{ needs.Version-Check.outputs.version }}
-          SIGNING_SUCCESS: ${{ needs.Code-Sign-macOS.result == 'success' }}
+          SIGNING_SUCCESS: ${{ needs.Code-Sign-macOS.outputs.signed == 'true' }}
         run: |
           mkdir -p release-artifacts
           
@@ -185,7 +185,7 @@ jobs:
       - name: Generate Changelog
         id: changelog
         env:
-          SIGNING_SUCCESS: ${{ needs.Code-Sign-macOS.result == 'success' }}
+          SIGNING_SUCCESS: ${{ needs.Code-Sign-macOS.outputs.signed == 'true' }}
         run: |
           pip install requests packaging
           python scripts/release/generate_changelog_draft.py > release-notes.md
