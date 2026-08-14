@@ -30,7 +30,7 @@ const NotifyNewVersionModal: React.FC<NotifyNewVersionModalProps> = ({
   const toast = useToast();
   const router = useRouter();
   const { t } = useTranslation();
-  const { config } = useLauncherConfig();
+  const { config, isZh } = useLauncherConfig();
   const primaryColor = config.appearance.theme.primaryColor;
 
   const isLinux = config.basicInfo.osType === "linux"; // for Linux, navigate to the website.
