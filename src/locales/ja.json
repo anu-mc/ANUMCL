@@ -19,6 +19,9 @@
         "sourceCode": {
           "title": "GitHub でソースコードを見る"
         },
+        "basedOn": {
+          "title": "SJMCL をベースにしています"
+        },
         "aboutSJMC": {
           "title": "上海交通大学 Minecraft クラブ (SJMC) について"
         }

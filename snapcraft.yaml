@@ -1,17 +1,17 @@
-name: sjmcl
+name: anumcl
 base: core22
 version: '0.0.0'
-summary: SJMCL Minecraft Launcher
+summary: ANUMCL Minecraft Launcher
 description: |
-  SJMC Minecraft Launcher. A modern, lightweight Minecraft launcher.
+  ANUMCL is a modern, lightweight Minecraft launcher based on SJMCL.
 
 grade: stable
 confinement: strict
 
 apps:
-  sjmcl:
-    command: usr/bin/SJMCL
-    desktop: usr/share/applications/SJMCL.desktop
+  anumcl:
+    command: usr/bin/ANUMCL
+    desktop: usr/share/applications/ANUMCL.desktop
     extensions: [gnome]
     environment:
       GTK_USE_PORTAL: "1"
@@ -29,7 +29,7 @@ apps:
       - home
 
 parts:
-  sjmcl-payload:
+  anumcl-payload:
     plugin: dump
     source: snap-payload
     stage-packages:
@@ -39,7 +39,7 @@ parts:
 
   cleanup:
     after:
-      - sjmcl-payload
+      - anumcl-payload
     plugin: nil
     build-snaps:
       - core22

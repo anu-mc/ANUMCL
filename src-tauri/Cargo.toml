@@ -1,10 +1,10 @@
 [package]
-name = "SJMCL"
+name = "ANUMCL"
 version.workspace = true
-description = "A Minecraft launcher from SJMC"
-authors = ["SJMCL Team"]
+description = "A Minecraft launcher based on SJMCL"
+authors = ["ANU-MC"]
 license = "GNU General Public License v3.0 (with additional terms)"
-repository = "https://github.com/UNIkeEN/SJMCL"
+repository = "https://github.com/anu-mc/ANUMCL"
 edition.workspace = true
 rust-version.workspace = true
 
@@ -13,7 +13,7 @@ members = ["crates/sjmcl-macros", "crates/sjmcl-types"]
 resolver = "3"
 
 [workspace.package]
-version = "1.2.0"
+version = "1.0.0"
 edition = "2024"
 rust-version = "1.91.0"
 

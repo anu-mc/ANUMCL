@@ -107,7 +107,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                 <Link
                   color={`${primaryColor}.500`}
                   onClick={() =>
-                    openUrl(t("HelpSettingsPage.top.settings.UserGroup.url"))
+                    openUrl("https://github.com/anu-mc/ANUMCL/issues")
                   }
                 />
               ),
@@ -115,7 +115,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                 <Link
                   color={`${primaryColor}.500`}
                   onClick={() =>
-                    openUrl("https://github.com/UNIkeEN/SJMCL/issues")
+                    openUrl("https://github.com/anu-mc/ANUMCL/issues")
                   }
                 />
               ),

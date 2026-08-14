@@ -7,7 +7,7 @@ use tauri_plugin_os::locale;
 
 use crate::launcher_config::models::MemoryInfo;
 
-/// Sends app version, OS type and self SHA-256 as statistic data to SJMC asynchronously.
+/// Sends the prefixed distribution version, OS type and self SHA-256 to SJMC asynchronously.
 ///
 /// # Examples
 ///
@@ -18,7 +18,7 @@ pub async fn send_statistics(version: String, os: String, sha256: String) {
   _ = reqwest::Client::new()
     .post("https://mc.sjtu.cn/api-sjmcl/statistics")
     .json(&json!({
-      "version": version,
+      "version": format!("ANU-{version}"),
       "os": os,
       "exe_sha256": sha256,
     }))

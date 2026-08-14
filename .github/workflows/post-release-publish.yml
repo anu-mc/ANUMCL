@@ -40,8 +40,8 @@ jobs:
           echo "is_prerelease=$IS_PRERELEASE" >> "$GITHUB_OUTPUT"
 
           assets=(
-            "SJMCL_${VERSION}_linux_x86_64.deb"
-            "SJMCL_${VERSION}_linux_aarch64.deb"
+            "ANUMCL_${VERSION}_linux_x86_64.deb"
+            "ANUMCL_${VERSION}_linux_aarch64.deb"
           )
 
           echo "Checking release assets for ${RELEASE_TAG}"
@@ -171,6 +171,7 @@ jobs:
             --body "Updates the English and Simplified Chinese changelogs from published release notes. This branch accumulates changelog entries across releases and is reset against the default branch after each merge."
 
   Publish-AUR:
+    if: ${{ false }} # Requires an ANUMCL-owned AUR package and deploy key.
     needs: [Prepare-Release-Assets]
     uses: ./.github/workflows/publish-aur.yml
     with:
@@ -180,6 +181,7 @@ jobs:
       AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
 
   Publish-Snap:
+    if: ${{ false }} # Requires an ANUMCL-owned Snap Store package and credentials.
     name: Publish Snap (${{ matrix.arch }})
     needs: [Prepare-Release-Assets]
     strategy:
@@ -197,7 +199,7 @@ jobs:
 
   Publish-Homebrew:
     needs: [Prepare-Release-Assets]
-    if: needs.Prepare-Release-Assets.outputs.is_prerelease == 'false'
+    if: ${{ false }} # Requires an ANUMCL-owned Homebrew tap and GitHub App.
     uses: ./.github/workflows/publish-homebrew.yml
     with:
       version: ${{ needs.Prepare-Release-Assets.outputs.version }}
@@ -208,7 +210,7 @@ jobs:
 
   Publish-Winget:
     needs: [Prepare-Release-Assets]
-    if: needs.Prepare-Release-Assets.outputs.is_prerelease == 'false'
+    if: ${{ false }} # Requires an ANUMCL-owned Winget publisher identity and token.
     uses: ./.github/workflows/publish-winget.yml
     with:
       version: ${{ needs.Prepare-Release-Assets.outputs.version }}

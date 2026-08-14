@@ -2,7 +2,7 @@ import { getCurrent, onOpenUrl } from "@tauri-apps/plugin-deep-link";
 import micromatch from "micromatch";
 import { useEffect, useRef } from "react";
 
-const SJMCL_LINK_PREFIX = "sjmcl://";
+const ANUMCL_LINK_PREFIX = "anumcl://";
 const EMIT_DEEPLINK_EVENT = "deeplink:emit";
 
 type TriggerRule = string | string[] | RegExp | ((subpath: string) => boolean);
@@ -40,8 +40,8 @@ export const useDeepLink = ({ trigger, onCall }: UseDeepLinkOptions) => {
 
     const handleUrls = (urls: string[]) => {
       urls.forEach((url) => {
-        if (url.startsWith(SJMCL_LINK_PREFIX)) {
-          const subpath = url.slice(SJMCL_LINK_PREFIX.length);
+        if (url.startsWith(ANUMCL_LINK_PREFIX)) {
+          const subpath = url.slice(ANUMCL_LINK_PREFIX.length);
           if (matchSubpath(subpath, trigger)) {
             onCall(url, subpath);
           }

@@ -19,6 +19,9 @@
         "sourceCode": {
           "title": "在 GitHub 查看源代码"
         },
+        "basedOn": {
+          "title": "本项目基于 SJMCL"
+        },
         "aboutSJMC": {
           "title": "关于上海交通大学 Minecraft 社（SJMC）"
         }

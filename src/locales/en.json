@@ -19,6 +19,9 @@
         "sourceCode": {
           "title": "View Source Code on GitHub"
         },
+        "basedOn": {
+          "title": "Based on SJMCL"
+        },
         "aboutSJMC": {
           "title": "About SJTU Minecraft Club (SJMC)"
         }

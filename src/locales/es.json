@@ -19,6 +19,9 @@
         "sourceCode": {
           "title": "Ver Código Fuente en GitHub"
         },
+        "basedOn": {
+          "title": "Basado en SJMCL"
+        },
         "aboutSJMC": {
           "title": "Acerca de SJTU Minecraft Club (SJMC)"
         }

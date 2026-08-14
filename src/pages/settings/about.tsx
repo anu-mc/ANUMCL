@@ -1,6 +1,4 @@
 import {
-  Avatar,
-  AvatarGroup,
   Button,
   HStack,
   Text,
@@ -66,8 +64,6 @@ const AboutSettingsPage = () => {
     setCheckingUpdate(false);
   }, [handleCheckLauncherUpdate, t, toast, closeToast, openSharedModal]);
 
-  const avatarUserList = ["UNIkeEN", "xunying123", "SundayChen"];
-
   const aboutSettingGroups: OptionItemGroupProps[] = [
     {
       title: t("AboutSettingsPage.about.title"),
@@ -108,36 +104,23 @@ const AboutSettingsPage = () => {
           ),
         },
         {
-          title: t("AboutSettingsPage.about.settings.contributors.title"),
+          title: t("AboutSettingsPage.about.settings.sourceCode.title"),
           children: (
-            <HStack spacing={2.5}>
-              <AvatarGroup size="xs" spacing={-2}>
-                {avatarUserList.map((username) => (
-                  <Avatar
-                    key={username}
-                    name={username}
-                    src={`https://avatars.githubusercontent.com/${username}`}
-                  />
-                ))}
-              </AvatarGroup>
-              <CommonIconButton
-                label="https://github.com/UNIkeEN/SJMCL/graphs/contributors?all=1"
-                icon="external"
-                withTooltip
-                tooltipPlacement="bottom-end"
-                size="xs"
-                h={18}
-                onClick={() => {
-                  openUrl(
-                    "https://github.com/UNIkeEN/SJMCL/graphs/contributors?all=1"
-                  );
-                }}
-              />
-            </HStack>
+            <CommonIconButton
+              label="https://github.com/anu-mc/ANUMCL"
+              icon="external"
+              withTooltip
+              tooltipPlacement="bottom-end"
+              size="xs"
+              h={18}
+              onClick={() => {
+                openUrl("https://github.com/anu-mc/ANUMCL");
+              }}
+            />
           ),
         },
         {
-          title: t("AboutSettingsPage.about.settings.sourceCode.title"),
+          title: t("AboutSettingsPage.about.settings.basedOn.title"),
           children: (
             <CommonIconButton
               label="https://github.com/UNIkeEN/SJMCL"
@@ -148,22 +131,6 @@ const AboutSettingsPage = () => {
               h={18}
               onClick={() => {
                 openUrl("https://github.com/UNIkeEN/SJMCL");
-              }}
-            />
-          ),
-        },
-        {
-          title: t("AboutSettingsPage.about.settings.aboutSJMC.title"),
-          children: (
-            <CommonIconButton
-              label="https://mc.sjtu.cn/welcome/content/3/"
-              icon="external"
-              withTooltip
-              tooltipPlacement="bottom-end"
-              size="xs"
-              h={18}
-              onClick={() => {
-                openUrl("https://mc.sjtu.cn/welcome/content/3/");
               }}
             />
           ),

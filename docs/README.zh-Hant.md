@@ -140,7 +140,6 @@ pnpm tauri dev
 
 ### 貢獻者
 
-![貢獻者](https://contrib.rocks/image?repo=UNIkeEN/SJMCL "貢獻者")
 
 ## 版權宣告
 
@@ -157,39 +156,3 @@ pnpm tauri dev
 3. 當對本軟體的修改僅限於**增加**（而非修改或刪除）預置認證伺服器（`src-tauri/src/account/helpers/authlib_injector/constants.rs`）時，前述第 1 條之限制不適用。在此情形下，您得繼續使用原始軟體名稱進行編譯與分發。
 
 另根據我們網站的使用者協議，當您分發本軟體的修改版本時，請僅向我們的資訊統計伺服器（`src-tauri/src/utils/sys_info.rs`）傳送帶字首（不少於兩個字母，如 `XX-0.0.1`）的版本號，除非您的修改滿足上述第 3 條限制。
-
-## 聯絡我們
-
-SJMCL 使用者 QQ 交流群：860851380
-
-您還可以傳送郵件至 [launcher@sjmc.club](mailto:launcher@sjmc.club) 來聯絡我們。
-
-## 社群合作伙伴
-
-衷心感謝以下組織對 SJMCL 專案開發與社群的支援。
-
-[
-  <picture>
-    <source srcset="figs/partners/sjmc-dark.png" media="(prefers-color-scheme: dark)">
-    <source srcset="figs/partners/sjmc.png" media="(prefers-color-scheme: light)">
-    <img src="figs/partners/sjmc.png" alt="SJMC" style="height: 65px;">
-  </picture>
-](https://mc.sjtu.cn)
-&nbsp;&nbsp;
-[<img src="figs/partners/sues-mc.png" alt="SUES-MC" style="height: 65px;"/>](https://www.suesmc.ltd/)
-
-[
-  <picture>
-    <source srcset="figs/partners/mua-dark.png" media="(prefers-color-scheme: dark)">
-    <source srcset="figs/partners/mua.png" media="(prefers-color-scheme: light)">
-    <img src="figs/partners/mua.png" alt="MUA" style="height: 45px;">
-  </picture>
-](https://www.mualliance.cn)
-&nbsp;&nbsp;&nbsp;&nbsp;
-[
-  <picture>
-    <source srcset="figs/partners/gnwork-dark.png" media="(prefers-color-scheme: dark)">
-    <source srcset="figs/partners/gnwork.png" media="(prefers-color-scheme: light)">
-    <img src="figs/partners/gnwork.png" alt="GNWORK" style="height: 45px;">
-  </picture>
-](https://space.bilibili.com/403097853)

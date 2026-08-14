@@ -1,10 +1,10 @@
 {
-  "identifier": "SJMCL",
+  "identifier": "io.github.anu-mc.anumcl",
   "app": {
     "windows": [
       {
         "label": "main",
-        "title": "SJMC Launcher",
+        "title": "ANUMCL",
         "url": "/",
         "width": 800,
         "height": 550,

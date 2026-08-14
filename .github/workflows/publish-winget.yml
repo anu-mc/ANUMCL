@@ -52,9 +52,9 @@ jobs:
               --jq ".assets[] | select(.name == \"${asset_name}\") | .digest"
           }
 
-          X64_ASSET="SJMCL_${VERSION}_windows_x86_64_setup.exe"
-          X86_ASSET="SJMCL_${VERSION}_windows_i686_setup.exe"
-          ARM64_ASSET="SJMCL_${VERSION}_windows_aarch64_setup.exe"
+          X64_ASSET="ANUMCL_${VERSION}_windows_x86_64_setup.exe"
+          X86_ASSET="ANUMCL_${VERSION}_windows_i686_setup.exe"
+          ARM64_ASSET="ANUMCL_${VERSION}_windows_aarch64_setup.exe"
 
           X64_DIGEST=$(get_asset_digest "$X64_ASSET")
           X86_DIGEST=$(get_asset_digest "$X86_ASSET")
@@ -168,8 +168,8 @@ jobs:
           BRANCH_NAME="sjmc-sjmcl-${VERSION}"
           MANIFEST_DIR="manifests/s/SJMC/SJMCL/${VERSION}"
 
-          git -C winget-pkgs config user.name "SJMC-Dev-Bot"
-          git -C winget-pkgs config user.email "launcher@sjmc.club"
+          git -C winget-pkgs config user.name "github-actions[bot]"
+          git -C winget-pkgs config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git -C winget-pkgs remote add upstream https://github.com/microsoft/winget-pkgs.git
           git -C winget-pkgs fetch upstream master

@@ -19,6 +19,9 @@
         "sourceCode": {
           "title": "覽源碼於群碼之匯"
         },
+        "basedOn": {
+          "title": "本項目基於 SJMCL"
+        },
         "aboutSJMC": {
           "title": "有涉上海交通大學礦藝社（SJMC）"
         }

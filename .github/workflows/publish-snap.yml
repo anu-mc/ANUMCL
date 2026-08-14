@@ -65,14 +65,14 @@ jobs:
           mkdir -p artifacts
           gh release download "$RELEASE_TAG" \
             --repo "$GH_REPO" \
-            --pattern "SJMCL_${{ inputs.version }}_linux_${{ inputs.arch }}.deb" \
+            --pattern "ANUMCL_${{ inputs.version }}_linux_${{ inputs.arch }}.deb" \
             --dir artifacts
 
       - name: Prepare Snap payload
         run: |
           mkdir -p snap-payload
           dpkg -x artifacts/*.deb snap-payload/
-          chmod +x snap-payload/usr/bin/SJMCL
+          chmod +x snap-payload/usr/bin/ANUMCL
 
       - name: Update Snapcraft version
         run: |

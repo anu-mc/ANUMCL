@@ -30,15 +30,14 @@ const NotifyNewVersionModal: React.FC<NotifyNewVersionModalProps> = ({
   const toast = useToast();
   const router = useRouter();
   const { t } = useTranslation();
-  const { config, isZh } = useLauncherConfig();
+  const { config } = useLauncherConfig();
   const primaryColor = config.appearance.theme.primaryColor;
 
   const isLinux = config.basicInfo.osType === "linux"; // for Linux, navigate to the website.
 
   const handleDownloadUpdate = () => {
     if (isLinux) {
-      const lang = isZh ? "zh" : "en";
-      openUrl(`https://mc.sjtu.cn/sjmcl/${lang}`);
+      openUrl("https://github.com/anu-mc/ANUMCL/releases");
     } else {
       ConfigService.downloadLauncherUpdate(newVersion).then((response) => {
         if (response.status !== "success") {

@@ -1,5 +1,5 @@
 {
-  "identifier": "SJMCL",
+  "identifier": "io.github.anu-mc.anumcl",
   "bundle": {
     "windows": {
       "nsis": {
@@ -21,7 +21,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "SJMC Launcher",
+        "title": "ANUMCL",
         "url": "/",
         "width": 820,
         "height": 550,
