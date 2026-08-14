@@ -1,124 +1,43 @@
-<img src="figs/banner.png" alt="SJMCL" />
+# ANUMCL
 
-[![Test Build](https://img.shields.io/github/actions/workflow/status/UNIkeEN/SJMCL/test.yml?label=test%20build&logo=github&style=for-the-badge)](https://github.com/UNIkeEN/SJMCL/blob/main/.github/workflows/test.yml)
-![Downloads](https://img.shields.io/github/downloads/UNIkeEN/SJMCL/total?logo=github&style=for-the-badge)
-![Stars](https://img.shields.io/github/stars/UNIkeEN/SJMCL?style=for-the-badge)
-![Runs](https://img.shields.io/badge/dynamic/json?color=blue&style=for-the-badge&label=runs&query=$.total_count_str&url=https%3A%2F%2Fmc.sjtu.cn%2Fapi-sjmcl%2Fcount)
-[![Deepwiki](https://img.shields.io/badge/Ask-DeepWiki-20B2AA?logo=&style=for-the-badge)](https://deepwiki.com/UNIkeEN/SJMCL)
+> ANUMCL 基於 [SJMCL](https://github.com/UNIkeEN/SJMCL) 開發，並依據 GPLv3 及上游 [附加條款](../LICENSE.EXTRA) 發布。
+
+[![Test Build](https://img.shields.io/github/actions/workflow/status/anu-mc/ANUMCL/test.yml?label=test%20build&logo=github&style=for-the-badge)](https://github.com/anu-mc/ANUMCL/blob/main/.github/workflows/test.yml)
+![Downloads](https://img.shields.io/github/downloads/anu-mc/ANUMCL/total?logo=github&style=for-the-badge)
+![Stars](https://img.shields.io/github/stars/anu-mc/ANUMCL?style=for-the-badge)
 
 [English](../README.md) · [简体中文](README.zh-Hans.md) · **繁體中文**
 
 ## 功能特性
 
 * **跨平臺支援**：相容 Windows 10/11、macOS 與 Linux。
-* **高效的實例管理**：支援多個遊戲目錄與實例，集中管理所有實例資源（如存檔、模組、資源包、光影包、截圖等）與設定。
-* **便捷的資源下載**：支援從 CurseForge 與 Modrinth 等源下載遊戲用戶端、模組載入器、各類遊戲資源與模組包。
+* **高效的實例管理**：支援多個遊戲目錄與實例，集中管理存檔、模組、資源包、光影包、截圖等資源與設定。
+* **便捷的資源下載**：支援從 CurseForge 與 Modrinth 等來源下載遊戲用戶端、模組載入器、各類遊戲資源與模組包。
 * **多帳戶系統支援**：內建 Microsoft 登入與第三方認證伺服器支援，相容 Yggdrasil Connect 的 OAuth 登入流程規範提案。
-* **外部服務協同**：透過深度連結與 MCP 服務，與外部網頁、程式及 Agent 服務協同運作，提供一系列便捷功能與自動化能力。
-* **開放擴展系統**：支援開發擴展，為啟動器擴展更多有趣且實用的功能。[>> 查看社區擴展](https://github.com/SJMC-Dev/awesome-SJMCL-extensions/blob/main/README.zh-Hant.md)
+* **外部服務協同**：透過深度連結與 MCP 服務，與外部網頁、程式及 Agent 服務協同運作。
+* **開放擴展系統**：支援擴展開發，擴充啟動器功能。
 
 > 注意：部分功能可能受地區、執行平臺或程式發行類型限制。
 
-### 技術堆疊
-
-[![Tauri](https://img.shields.io/badge/Tauri-v2-FFC131?style=for-the-badge&logo=tauri&logoColor=white&labelColor=24C8DB)](https://tauri.app/)
-[![Next JS](https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
-[![Chakra UI](https://img.shields.io/badge/chakra_ui-v2-38B2AC?style=for-the-badge&logo=chakraui&logoColor=white&labelColor=319795)](https://v2.chakra-ui.com/)
-
 ## 開始使用
 
-開始使用 SJMCL，只需前往 [官網](https://mc.sjtu.cn/sjmcl/downloads) 下載最新版即可。
+請從 [ANUMCL Releases](https://github.com/anu-mc/ANUMCL/releases) 下載最新版本。
 
-您也可以在 [GitHub Releases](https://github.com/UNIkeEN/SJMCL/releases) 獲取所有版本，包括週期性構建。
+| 平臺 | 系統版本 | 架構 | 提供的發行類型 |
+| --- | --- | --- | --- |
+| Windows | 10 及以上 | `aarch64`、`i686`、`x86_64` | 安裝版 `.exe`、便攜版 `.exe` |
+| macOS | 10.15 及以上 | `aarch64`、`x86_64` | `.app`、`.dmg` |
+| Linux | webkit2gtk 4.1（如 Ubuntu 22.04） | `aarch64`、`x86_64` | `.deb`、`.rpm`、便攜版二進位檔案 |
 
-SJMCL 目前支援以下平臺：
-
-| 平臺    | 系統版本            | 架構               | 提供的發行類型                              |
-|---------|---------------------|--------------------|--------------------------------------------|
-| Windows | 10 及以上         | `aarch64`, `i686`, `x86_64`   | 安裝版 `.exe`，便攜版 `.exe` |
-| macOS   | 10.15 及以上        | `aarch64`, `x86_64`| `.app`，`.dmg`                   |
-| Linux   | webkit2gtk 4.1 (如 Ubuntu 22.04) | `aarch64`, `x86_64` | `.deb`, `.rpm`, 便攜版二進位制檔案 |
-
-了解更多功能與常見問題，請參閱 [使用者文件](https://mc.sjtu.cn/sjmcl/docs)。
-
-<details>
-<summary><h3>從命令列安裝</h3></summary>
-
-<details>
-<summary><h4>Linux</h4></summary>
-
-使用 Linux 一鍵安裝腳本安裝最新正式版：
-
-```bash
-curl -LsSf https://mc.sjtu.cn/sjmcl/releases/install.sh | sh -s -- --source sjmc
-```
-
-不使用 root 權限安裝 Linux 便攜版：
-
-```bash
-curl -LsSf https://mc.sjtu.cn/sjmcl/releases/install.sh | sh -s -- --portable --source sjmc
-```
-
-透過常見的 [AUR 助手](https://wiki.archlinux.org/title/AUR_helpers) 從 Arch Linux 使用者套件庫（AUR）安裝：
-
-```bash
-yay -S sjmcl-bin
-```
-
-若不使用 AUR 助手，您也可以手動安裝：
-
-```bash
-git clone https://aur.archlinux.org/sjmcl-bin.git
-cd sjmcl-bin
-makepkg -si
-```
-
-透過 Snap Store 安裝：
-
-```bash
-sudo snap install sjmcl
-```
-
-> [!WARNING]
-> 使用 Snap 安裝時，遊戲資料可能會預設存放在沙盒目錄內。解除安裝啟動器前，請及時備份存檔、資源包、模組等重要資料。
-
-</details>
-
-<details>
-<summary><h4>macOS</h4></summary>
-
-透過 Homebrew 安裝：
-
-```bash
-brew install --cask SJMC-Dev/SJMCL/sjmcl
-```
-
-</details>
-
-<details>
-<summary><h4>Windows</h4></summary>
-
-透過 Winget 安裝：
-
-```powershell
-winget install SJMC.SJMCL
-```
-
-> [!WARNING]
-> Winget 的索引倉庫是公開協作維護的。安裝前建議執行 `winget show SJMC.SJMCL` 檢視安裝器位址，並確認下載來源來自 `github.com/UNIkeEN/SJMCL` 或 `sjmcl.club`。
-
-</details>
-
-更多安裝方式與平臺注意事項，請參閱 [使用者文件](https://mc.sjtu.cn/sjmcl/docs/install)。
-
-</details>
+第三方軟體來源尚未設定，請直接使用 GitHub Releases 中的安裝檔。
 
 ## 開發與貢獻
 
-首先複製（clone）本專案並安裝前端依賴：
+複製本專案並安裝前端依賴：
 
 ```bash
-git clone git@github.com:UNIkeEN/SJMCL.git
+git clone https://github.com/anu-mc/ANUMCL.git
+cd ANUMCL
 pnpm install
 ```
 
@@ -128,31 +47,12 @@ pnpm install
 pnpm tauri dev
 ```
 
-我們熱烈歡迎每一位開發者的貢獻。
+請透過 [Pull Requests](https://github.com/anu-mc/ANUMCL/pulls) 或 [Issues](https://github.com/anu-mc/ANUMCL/issues) 參與貢獻。
 
-* 在開始前，請先閱讀我們的 [貢獻指南](https://github.com/UNIkeEN/SJMCL/blob/main/CONTRIBUTING.md)（內含開發流程詳細說明）。
-* API 參考與部分開發者筆記見 [開發者文件](https://mc.sjtu.cn/sjmcl/dev)。
-* 歡迎透過 [Pull Request](https://github.com/UNIkeEN/SJMCL/pulls) 或 [GitHub Issues](https://github.com/UNIkeEN/SJMCL/issues) 分享您的想法。
+## 版權與授權
 
-### 開發擴展
+版權所有 © 2024-2026 ANU-MC 與 SJMCL 貢獻者。
 
-如果您希望為 SJMCL 開發擴展，歡迎查看 [擴展文件](https://mc.sjtu.cn/sjmcl/dev/extension/)。內含擴展系統的介紹、API 參考。我們還提供了腳手架，便於快速建立範本專案並上手。
+> 本軟體並非官方 Minecraft 服務，未獲得 Mojang 或 Microsoft 批准或關聯許可。
 
-### 貢獻者
-
-
-## 版權宣告
-
-版權所有 © 2024-2026 SJMCL 團隊。
-
-> 本軟體並非官方 Minecraft 服務。未獲得 Mojang 或 Microsoft 批准或關聯許可。
-
-本專案基於 [GNU 通用公眾授權條款 v3.0](../LICENSE) 釋出。
-
-依據 GPLv3 第 7 條款，當您分發本軟體的修改版本時，除遵守 GPLv3 外，還須遵守以下 [附加條款](../LICENSE.EXTRA)：
-
-1. 必須更換軟體名稱，禁止使用 SJMCL 或 SJMC Launcher；
-2. 在您的專案 README、分發網站或相關文件、軟體的關於頁面中，須明確標註您的程式基於 SJMCL，並註明原專案連結。
-3. 當對本軟體的修改僅限於**增加**（而非修改或刪除）預置認證伺服器（`src-tauri/src/account/helpers/authlib_injector/constants.rs`）時，前述第 1 條之限制不適用。在此情形下，您得繼續使用原始軟體名稱進行編譯與分發。
-
-另根據我們網站的使用者協議，當您分發本軟體的修改版本時，請僅向我們的資訊統計伺服器（`src-tauri/src/utils/sys_info.rs`）傳送帶字首（不少於兩個字母，如 `XX-0.0.1`）的版本號，除非您的修改滿足上述第 3 條限制。
+本專案基於 [GNU 通用公眾授權條款 v3.0](../LICENSE) 發布，並適用上游 SJMCL 的 [GPLv3 第 7 條附加條款](../LICENSE.EXTRA)。
