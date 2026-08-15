@@ -270,7 +270,7 @@ pub async fn run() {
           local_ygg_server.run().await.unwrap_or_default();
         });
 
-        // check if full account feature (offline and 3rd-party login) is available
+        // enable full account feature (offline and 3rd-party login)
         let app_handle = app.handle().clone();
         tauri::async_runtime::spawn(async move {
           account::helpers::misc::check_full_login_availability(&app_handle)

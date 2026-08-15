@@ -570,6 +570,14 @@
     }
   },
   "DownloadSettingPage": {
+    "github": {
+      "title": "GitHub ダウンロードミラー",
+      "autoSelect": "最速ミラーを自動選択",
+      "autoSelectDescription": "GitHub リソースのダウンロード時にミラーを測定",
+      "mirror": { "title": "優先ミラー", "auto": "自動", "official": "GitHub 直接" },
+      "test": "最速ミラーを測定",
+      "testFailed": "利用可能なミラーがありません"
+    },
     "source": {
       "title": "ソース",
       "settings": {

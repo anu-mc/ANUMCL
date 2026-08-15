@@ -34,6 +34,7 @@ import { useTaskContext } from "@/contexts/task";
 import { useToast } from "@/contexts/toast";
 import { GTaskEventStatusEnums } from "@/models/task";
 import { ConfigService } from "@/services/config";
+import { UtilsService } from "@/services/utils";
 
 const DownloadSettingsPage = () => {
   const { t } = useTranslation();
@@ -65,6 +66,14 @@ const DownloadSettingsPage = () => {
   );
   const [isClearingDownloadCache, setIsClearingDownloadCache] =
     useState<boolean>(false);
+  const [isTestingGithub, setIsTestingGithub] = useState(false);
+  const githubMirrors = [
+    { value: "auto", label: t("DownloadSettingPage.github.mirror.auto") },
+    { value: "", label: t("DownloadSettingPage.github.mirror.official") },
+    { value: "https://ghfast.top/", label: "ghfast.top" },
+    { value: "https://ghproxy.net/", label: "ghproxy.net" },
+    { value: "https://gh-proxy.com/", label: "gh-proxy.com" },
+  ];
 
   const sourceStrategyTypes = ["auto", "official", "mirror"];
 
@@ -285,6 +294,78 @@ const DownloadSettingsPage = () => {
               },
             ]
           : []),
+      ],
+    },
+    {
+      title: t("DownloadSettingPage.github.title"),
+      items: [
+        {
+          title: t("DownloadSettingPage.github.autoSelect"),
+          description: t("DownloadSettingPage.github.autoSelectDescription"),
+          children: (
+            <Switch
+              colorScheme={primaryColor}
+              isChecked={downloadConfigs.github.autoSelect}
+              onChange={(event) =>
+                update("download.github.autoSelect", event.target.checked)
+              }
+            />
+          ),
+        },
+        {
+          title: t("DownloadSettingPage.github.mirror.title"),
+          children: (
+            <MenuSelector
+              options={githubMirrors}
+              value={downloadConfigs.github.mirror}
+              onSelect={(value) => update("download.github.mirror", value)}
+            />
+          ),
+        },
+        {
+          title: t("DownloadSettingPage.github.test"),
+          children: (
+            <Button
+              size="xs"
+              variant="subtle"
+              isLoading={isTestingGithub}
+              onClick={async () => {
+                setIsTestingGithub(true);
+                const results = await Promise.all(
+                  githubMirrors.slice(1).map(async (mirror) => {
+                    const result = await UtilsService.checkServiceAvailability(
+                      `${mirror.value}https://github.com`
+                    );
+                    return {
+                      mirror,
+                      latency: result.status === "success" ? result.data : null,
+                    };
+                  })
+                );
+                const fastest = results
+                  .filter((item) => item.latency !== null)
+                  .sort(
+                    (a, b) => (a.latency ?? Infinity) - (b.latency ?? Infinity)
+                  )[0];
+                if (fastest) {
+                  update("download.github.mirror", fastest.mirror.value);
+                  toast({
+                    title: `${fastest.mirror.label}: ${fastest.latency} ms`,
+                    status: "success",
+                  });
+                } else {
+                  toast({
+                    title: t("DownloadSettingPage.github.testFailed"),
+                    status: "error",
+                  });
+                }
+                setIsTestingGithub(false);
+              }}
+            >
+              {t("DownloadSettingPage.github.test")}
+            </Button>
+          ),
+        },
       ],
     },
     {

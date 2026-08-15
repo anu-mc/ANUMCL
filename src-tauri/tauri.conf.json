@@ -61,7 +61,8 @@
       "assets/icons/icon.ico": "assets/icons/icon.ico",
       "assets/icons/icon.png": "assets/icons/icon.png",
       "assets/icons/variants/square.png": "assets/icons/variants/square.png",
-      "assets/db/*": "assets/db/"
+      "assets/db/*": "assets/db/",
+      "target/release/WebView2Loader.dll": "WebView2Loader.dll"
     }
   },
   "plugins": {

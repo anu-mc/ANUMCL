@@ -570,6 +570,14 @@
     }
   },
   "DownloadSettingPage": {
+    "github": {
+      "title": "GitHub download mirrors",
+      "autoSelect": "Automatically select fastest mirror",
+      "autoSelectDescription": "Test mirrors automatically when downloading GitHub resources",
+      "mirror": { "title": "Preferred mirror", "auto": "Automatic", "official": "GitHub direct" },
+      "test": "Test and use fastest mirror",
+      "testFailed": "No mirror is available"
+    },
     "source": {
       "title": "Source",
       "settings": {

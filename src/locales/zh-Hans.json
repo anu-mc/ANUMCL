@@ -570,6 +570,14 @@
     }
   },
   "DownloadSettingPage": {
+    "github": {
+      "title": "GitHub 下载镜像",
+      "autoSelect": "自动选择最快镜像",
+      "autoSelectDescription": "下载 GitHub 资源时自动测速并选择最快站点",
+      "mirror": { "title": "首选镜像", "auto": "自动测速", "official": "GitHub 官方直连" },
+      "test": "测速并使用最快镜像",
+      "testFailed": "所有镜像均不可用"
+    },
     "source": {
       "title": "源",
       "settings": {

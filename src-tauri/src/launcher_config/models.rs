@@ -296,6 +296,12 @@ structstruck::strike! {
         #[default = "auto"]
         pub strategy: String,
       },
+      pub github: struct GithubConfig {
+        #[default = true]
+        pub auto_select: bool,
+        #[default = "auto"]
+        pub mirror: String,
+      },
       pub transmission: struct {
         #[default = true]
         pub auto_concurrent: bool,

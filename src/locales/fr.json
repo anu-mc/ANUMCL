@@ -570,6 +570,14 @@
     }
   },
   "DownloadSettingPage": {
+    "github": {
+      "title": "Miroirs de téléchargement GitHub",
+      "autoSelect": "Sélection automatique du plus rapide",
+      "autoSelectDescription": "Tester les miroirs lors des téléchargements GitHub",
+      "mirror": { "title": "Miroir préféré", "auto": "Automatique", "official": "GitHub direct" },
+      "test": "Tester le miroir le plus rapide",
+      "testFailed": "Aucun miroir disponible"
+    },
     "source": {
       "title": "Source",
       "settings": {

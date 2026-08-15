@@ -96,54 +96,6 @@ pub fn with_retry(client: Client) -> ClientWithMiddleware {
     .build()
 }
 
-/// Check whether the current IP is located in mainland China.
-///
-/// This function queries two Cloudflare trace endpoints in parallel.
-/// If either endpoint reports `loc=CN`, the IP is considered to be in mainland China.
-/// The detection result is cached into the launcher config.
-///
-/// # Arguments
-///
-/// * `app` - The Tauri AppHandle.
-///
-/// # Returns
-///
-/// * `Some(true)` if either endpoint reports mainland China.
-/// * `Some(false)` if both endpoints report non-mainland China.
-/// * `None` if both detection requests fail.
-pub async fn is_china_mainland_ip(app: &AppHandle) -> Option<bool> {
-  let client = app.state::<Client>();
-
-  async fn fetch_and_extract_loc(client: &Client, url: &str) -> Option<String> {
-    let resp = client.get(url).send().await.ok()?;
-    let text = resp.text().await.ok()?;
-    let loc_line = text.lines().find(|line| line.starts_with("loc="))?;
-    let loc = loc_line.split('=').nth(1)?.trim();
-    log::info!("Check location from {}, return {}", url, loc);
-    Some(loc.to_string())
-  }
-
-  let (loc1, loc2) = tokio::join!(
-    fetch_and_extract_loc(&client, "https://cloudflare.com/cdn-cgi/trace"),
-    fetch_and_extract_loc(&client, "https://www.cloudflare-cn.com/cdn-cgi/trace")
-  );
-  let result = loc1.as_deref() == Some("CN") || loc2.as_deref() == Some("CN");
-
-  let config_binding = app.state::<Mutex<LauncherConfig>>();
-  match config_binding.lock() {
-    Ok(mut config_state) => {
-      let _ = config_state.partial_update(
-        app,
-        "basic_info.is_china_mainland_ip",
-        &serde_json::to_string(&result).unwrap_or("false".to_string()),
-      );
-    }
-    Err(_) => return Some(false),
-  }
-
-  Some(result)
-}
-
 /// Normalizes a URL string for semantic equality comparison, including:
 /// - Lowercasing the scheme and the host (ref to RFC 3986, impl by Url::parse)
 /// - Removing trailing slashes from paths (except for root `/`)

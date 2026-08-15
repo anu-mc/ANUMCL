@@ -6,8 +6,8 @@ use sjmcl_types::error::{SJMCLError, SJMCLResult};
 use std::error::Error;
 use std::future::Future;
 use std::path::PathBuf;
-use std::sync::{Arc, RwLock};
-use std::time::Duration;
+use std::sync::{Arc, Mutex, OnceLock, RwLock};
+use std::time::{Duration, Instant};
 use tauri::{AppHandle, Manager, Url};
 use tauri_plugin_http::reqwest;
 use tauri_plugin_http::reqwest::header::RANGE;
@@ -26,6 +26,14 @@ use crate::tasks::*;
 use crate::utils::fs::validate_sha1;
 use crate::utils::web::with_retry;
 
+const GITHUB_MIRRORS: [&str; 4] = [
+  "",
+  "https://ghfast.top/",
+  "https://ghproxy.net/",
+  "https://gh-proxy.com/",
+];
+static GITHUB_FASTEST: OnceLock<Mutex<Option<(Instant, String)>>> = OnceLock::new();
+
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct DownloadParam {
@@ -43,6 +51,67 @@ pub struct DownloadTask {
 }
 
 impl DownloadTask {
+  async fn resolve_github_url(app_handle: &AppHandle, url: &Url) -> Url {
+    let Some(host) = url.host_str() else {
+      return url.clone();
+    };
+    if host != "github.com" && host != "raw.githubusercontent.com" {
+      return url.clone();
+    }
+    let config = match retrieve_launcher_config(app_handle.clone()) {
+      Ok(config) => config.download.github,
+      Err(_) => return url.clone(),
+    };
+    if !config.auto_select {
+      return Self::apply_github_mirror(&config.mirror, url);
+    }
+    if config.mirror != "auto" {
+      return Self::apply_github_mirror(&config.mirror, url);
+    }
+    let cache = GITHUB_FASTEST.get_or_init(|| Mutex::new(None));
+    if let Some((at, mirror)) = cache.lock().unwrap().as_ref()
+      && at.elapsed() < Duration::from_secs(600)
+    {
+      return Self::apply_github_mirror(mirror, url);
+    }
+    let client = with_retry(app_handle.state::<reqwest::Client>().inner().clone());
+    let mut checks = futures::stream::FuturesUnordered::new();
+    for mirror in GITHUB_MIRRORS {
+      let target = Self::apply_github_mirror(mirror, url);
+      let started = Instant::now();
+      let client = client.clone();
+      checks.push(async move {
+        let result = client.get(target).send().await;
+        result
+          .ok()
+          .filter(|response| response.status().is_success() || response.status().is_client_error())
+          .map(|_| (started.elapsed(), mirror.to_string()))
+      });
+    }
+    let mut fastest: Option<(Duration, String)> = None;
+    while let Some(result) = checks.next().await {
+      if fastest.as_ref().is_none_or(|current| {
+        result
+          .as_ref()
+          .is_some_and(|candidate| candidate.0 < current.0)
+      }) {
+        if let Some(candidate) = result {
+          fastest = Some(candidate);
+        }
+      }
+    }
+    let mirror = fastest.map(|(_, mirror)| mirror).unwrap_or_default();
+    *cache.lock().unwrap() = Some((Instant::now(), mirror.clone()));
+    Self::apply_github_mirror(&mirror, url)
+  }
+
+  fn apply_github_mirror(mirror: &str, url: &Url) -> Url {
+    if mirror.is_empty() || mirror == "auto" {
+      return url.clone();
+    }
+    Url::parse(&format!("{mirror}{url}")).unwrap_or_else(|_| url.clone())
+  }
+
   pub fn new(
     app_handle: AppHandle,
     task_id: u32,
@@ -130,11 +199,12 @@ impl DownloadTask {
   ) -> SJMCLResult<reqwest::Response> {
     let state = app_handle.state::<reqwest::Client>();
     let client = with_retry(state.inner().clone());
+    let src = Self::resolve_github_url(app_handle, &param.src).await;
     let mut request = if current == 0 {
-      client.get(param.src.clone())
+      client.get(src.clone())
     } else {
       client
-        .get(param.src.clone())
+        .get(src.clone())
         .header(RANGE, format!("bytes={current}-"))
     };
 

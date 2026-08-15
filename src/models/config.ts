@@ -119,6 +119,10 @@ export interface LauncherConfig {
     source: {
       strategy: string;
     };
+    github: {
+      autoSelect: boolean;
+      mirror: string;
+    };
     transmission: {
       autoConcurrent: boolean;
       concurrentCount: number;
@@ -310,6 +314,10 @@ export const defaultConfig: LauncherConfig = {
   download: {
     source: {
       strategy: "auto",
+    },
+    github: {
+      autoSelect: true,
+      mirror: "auto",
     },
     transmission: {
       autoConcurrent: true,

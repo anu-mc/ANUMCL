@@ -570,6 +570,14 @@
     }
   },
   "DownloadSettingPage": {
+    "github": {
+      "title": "Espejos de descarga de GitHub",
+      "autoSelect": "Seleccionar automáticamente el más rápido",
+      "autoSelectDescription": "Probar espejos al descargar recursos de GitHub",
+      "mirror": { "title": "Espejo preferido", "auto": "Automático", "official": "GitHub directo" },
+      "test": "Probar espejo más rápido",
+      "testFailed": "No hay espejos disponibles"
+    },
     "source": {
       "title": "Fuente",
       "settings": {
