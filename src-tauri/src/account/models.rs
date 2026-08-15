@@ -261,13 +261,14 @@ pub struct AuthServerInfo {
 
 impl From<AuthServerInfo> for AuthServer {
   fn from(info: AuthServerInfo) -> Self {
+    let is_ahnumc_auth_server = info.auth_url == AHNUMC_AUTH_SERVER_URL;
     AuthServer {
       name: info.metadata["meta"]["serverName"]
         .as_str()
         .unwrap_or_default()
         .to_string(),
       auth_url: info.auth_url,
-      homepage_url: if info.auth_url == AHNUMC_AUTH_SERVER_URL {
+      homepage_url: if is_ahnumc_auth_server {
         AHNUMC_HOMEPAGE_URL.to_string()
       } else {
         info.metadata["meta"]["links"]["homepage"]

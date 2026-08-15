@@ -118,7 +118,23 @@
       "server": {
         "title": "サーバーダウンロード",
         "description": "各バージョンのヴァニラサーバーファイルをダウンロード"
+      },
+      "ahnumcServers": {
+        "title": "AHNUMC サーバー",
+        "description": "AHNUMC サーバーを閲覧してクライアントModパックをインストール"
       }
+    }
+  },
+  "AhnumcServersPage": {
+    "title": "AHNUMC サーバー",
+    "description": "AHNUMC サーバー一覧からクライアントModパックをダウンロードしてインストールします。",
+    "install": "クライアントをインストール",
+    "modCount": "{{count}} 個のMOD",
+    "empty": "利用可能なサーバーはありません",
+    "downloadStarted": "{{name}} のダウンロードを開始しました",
+    "error": {
+      "fetchFailed": "サーバー一覧を取得できませんでした。接続を確認して再試行してください。",
+      "cacheDirectory": "ダウンロードキャッシュディレクトリを利用できません。"
     }
   },
   "AddAuthServerModal": {

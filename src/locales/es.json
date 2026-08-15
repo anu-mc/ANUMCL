@@ -118,7 +118,23 @@
       "server": {
         "title": "Descargar Servidor de Juego",
         "description": "Descargar archivos del servidor de juego para diferentes versiones"
+      },
+      "ahnumcServers": {
+        "title": "Servidores AHNUMC",
+        "description": "Explorar servidores AHNUMC e instalar modpacks de cliente"
       }
+    }
+  },
+  "AhnumcServersPage": {
+    "title": "Servidores AHNUMC",
+    "description": "Descargar e instalar modpacks de cliente desde la lista de servidores AHNUMC.",
+    "install": "Instalar cliente",
+    "modCount": "{{count}} mods",
+    "empty": "No hay servidores disponibles",
+    "downloadStarted": "Descarga iniciada: {{name}}",
+    "error": {
+      "fetchFailed": "No se pudo obtener la lista de servidores. Comprueba la conexión e inténtalo de nuevo.",
+      "cacheDirectory": "El directorio de caché de descargas no está disponible."
     }
   },
   "AddAuthServerModal": {

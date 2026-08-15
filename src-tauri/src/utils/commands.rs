@@ -68,6 +68,30 @@ pub async fn check_service_availability(
 }
 
 #[tauri::command]
+pub async fn fetch_remote_json(
+  client: State<'_, reqwest::Client>,
+  url: String,
+) -> SJMCLResult<serde_json::Value> {
+  let parsed_url = Url::parse(&url).map_err(|_| LauncherConfigError::FetchError)?;
+  if parsed_url.scheme() != "http" && parsed_url.scheme() != "https" {
+    return Err(LauncherConfigError::FetchError.into());
+  }
+
+  let response = client
+    .get(parsed_url)
+    .send()
+    .await
+    .map_err(|_| LauncherConfigError::FetchError)?
+    .error_for_status()
+    .map_err(|_| LauncherConfigError::FetchError)?;
+
+  response
+    .json::<serde_json::Value>()
+    .await
+    .map_err(|_| LauncherConfigError::FetchError.into())
+}
+
+#[tauri::command]
 pub fn extract_filename(path_str: String, with_ext: bool) -> SJMCLResult<String> {
   Ok(extract_filename_helper(&path_str, with_ext))
 }

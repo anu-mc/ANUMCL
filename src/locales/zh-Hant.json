@@ -118,7 +118,23 @@
       "server": {
         "title": "下載服務端",
         "description": "下載各版本原版遊戲服務端檔案"
+      },
+      "ahnumcServers": {
+        "title": "AHNUMC 伺服器",
+        "description": "瀏覽 AHNUMC 伺服器並安裝客戶端模組包"
       }
+    }
+  },
+  "AhnumcServersPage": {
+    "title": "AHNUMC 伺服器",
+    "description": "從 AHNUMC 伺服器清單下載並安裝客戶端模組包。",
+    "install": "安裝客戶端",
+    "modCount": "{{count}} 個模組",
+    "empty": "暫無可用伺服器",
+    "downloadStarted": "{{name}} 已開始下載",
+    "error": {
+      "fetchFailed": "取得伺服器清單失敗，請檢查網路連線後重試。",
+      "cacheDirectory": "下載快取目錄不可用。"
     }
   },
   "AddAuthServerModal": {

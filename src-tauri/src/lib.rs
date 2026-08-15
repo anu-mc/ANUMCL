@@ -204,6 +204,7 @@ pub async fn run() {
         utils::commands::retrieve_resolution_upbound,
         utils::commands::retrieve_truetype_font_list,
         utils::commands::check_service_availability,
+        utils::commands::fetch_remote_json,
         utils::commands::extract_filename,
         utils::commands::create_window,
         utils::commands::delete_file,

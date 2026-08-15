@@ -118,7 +118,23 @@
       "server": {
         "title": "引伺服端",
         "description": "引諸版之官式伺服端案。"
+      },
+      "ahnumcServers": {
+        "title": "AHNUMC 伺服器",
+        "description": "觀 AHNUMC 伺服器而置客戶改囊"
       }
+    }
+  },
+  "AhnumcServersPage": {
+    "title": "AHNUMC 伺服器",
+    "description": "自 AHNUMC 伺服器清單引而置客戶改囊。",
+    "install": "置客戶端",
+    "modCount": "{{count}} 改",
+    "empty": "今無可用伺服器",
+    "downloadStarted": "已引 {{name}}",
+    "error": {
+      "fetchFailed": "取伺服器清單失敗，請察網而再試。",
+      "cacheDirectory": "引案夾不可用。"
     }
   },
   "AddAuthServerModal": {

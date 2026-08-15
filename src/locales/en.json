@@ -118,7 +118,23 @@
       "server": {
         "title": "Download Game Server",
         "description": "Download game server files for different versions"
+      },
+      "ahnumcServers": {
+        "title": "AHNUMC Servers",
+        "description": "Browse AHNUMC servers and install client modpacks"
       }
+    }
+  },
+  "AhnumcServersPage": {
+    "title": "AHNUMC Servers",
+    "description": "Download and install client modpacks from the AHNUMC server list.",
+    "install": "Install Client",
+    "modCount": "{{count}} mods",
+    "empty": "No servers are available",
+    "downloadStarted": "Started downloading {{name}}",
+    "error": {
+      "fetchFailed": "Failed to fetch the server list. Check your connection and try again.",
+      "cacheDirectory": "The download cache directory is unavailable."
     }
   },
   "AddAuthServerModal": {
