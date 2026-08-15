@@ -7,7 +7,9 @@ use uuid::Uuid;
 
 use crate::APP_DATA_DIR;
 use crate::account::constants::ACCOUNTS_FILE_NAME;
-use crate::account::helpers::authlib_injector::constants::PRESET_AUTH_SERVERS;
+use crate::account::helpers::authlib_injector::constants::{
+  AHNUMC_AUTH_SERVER_URL, AHNUMC_HOMEPAGE_URL, PRESET_AUTH_SERVERS,
+};
 use crate::account::helpers::skin::draw_avatar;
 use crate::utils::image::ImageWrapper;
 
@@ -265,10 +267,14 @@ impl From<AuthServerInfo> for AuthServer {
         .unwrap_or_default()
         .to_string(),
       auth_url: info.auth_url,
-      homepage_url: info.metadata["meta"]["links"]["homepage"]
-        .as_str()
-        .unwrap_or_default()
-        .to_string(),
+      homepage_url: if info.auth_url == AHNUMC_AUTH_SERVER_URL {
+        AHNUMC_HOMEPAGE_URL.to_string()
+      } else {
+        info.metadata["meta"]["links"]["homepage"]
+          .as_str()
+          .unwrap_or_default()
+          .to_string()
+      },
       register_url: info.metadata["meta"]["links"]["register"]
         .as_str()
         .unwrap_or_default()
