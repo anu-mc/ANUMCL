@@ -15,10 +15,13 @@ AHNUMCL follows [Semantic Versioning 2.0.0](https://semver.org/).
 
 `2026-08-15`
 
-- 🌟 Add AHNUMC server list and one-click client modpack installation from the instance page.
-- 🌟 Add AHNUMC third-party account login and remove the Microsoft-first login restriction.
-- 🌟 Add GitHub download mirror settings, automatic latency testing, and fastest-mirror selection.
-- 🛠 Move built-in server and news sources to the AHNUMC API.
+- 🛠 refactor: rename ANUMCL to AHNUMCL @FloranceYeh
+- 📚 docs: update banner with new name @FloranceYeh
+- 🌟 feat(account): use AHNUMC auth server @FloranceYeh
+- 🌟 feat(instance): add AHNUMC server modpack installation @FloranceYeh
+- 🌟 feat(download): add GitHub mirror selection and login updates @FloranceYeh
+- 🌟 feat(api): use AHNUMC server and article endpoints @FloranceYeh
+- 📦 chore(release): bump version to 1.0.1 @FloranceYeh
 
 ## 1.0.0
 

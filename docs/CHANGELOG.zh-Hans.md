@@ -15,10 +15,7 @@ AHNUMCL 遵循[语义化版本规范 2.0.0](https://semver.org/lang/zh-CN/)。
 
 `2026-08-15`
 
-- 🌟 在实例页面新增 AHNUMC 服务器列表，并支持一键安装客户端整合包。
-- 🌟 新增 AHNUMC 第三方账号登录，移除必须优先使用微软登录的限制。
-- 🌟 新增 GitHub 下载镜像设置、自动测速与最快镜像选择。
-- 🛠 将内置服务器列表和新闻源迁移至 AHNUMC API。
+⚠️ **Note:** macOS artifacts in this release are **not code-signed**. macOS users may see security warnings when running the application.
 
 ## 1.0.0
 
