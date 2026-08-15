@@ -1,10 +1,10 @@
 [package]
-name = "ANUMCL"
+name = "AHNUMCL"
 version.workspace = true
 description = "A Minecraft launcher based on SJMCL"
-authors = ["ANU-MC"]
+authors = ["AHNUMC"]
 license = "GNU General Public License v3.0 (with additional terms)"
-repository = "https://github.com/anu-mc/ANUMCL"
+repository = "https://github.com/ahnumc/AHNUMCL"
 edition.workspace = true
 rust-version.workspace = true
 

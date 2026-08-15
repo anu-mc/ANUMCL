@@ -15,11 +15,11 @@ use crate::tasks::download::DownloadParam;
 
 type SourceTuple = (&'static str, &'static str, fn(&str, &str) -> String);
 const SOURCES: [SourceTuple; 1] = [(
-  "https://api.github.com/repos/anu-mc/ANUMCL/releases/latest",
+  "https://api.github.com/repos/ahnumc/AHNUMCL/releases/latest",
   "tag_name",
   |ver, fname| {
     format!(
-      "https://github.com/anu-mc/ANUMCL/releases/download/v{}/{}",
+      "https://github.com/ahnumc/AHNUMCL/releases/download/v{}/{}",
       ver, fname
     )
   },
@@ -40,7 +40,7 @@ fn build_resource_filename(ver: &str, os: &str, arch: &str, is_portable: bool) -
     "macos" => ".app.tar.gz",
     _ => "",
   };
-  format!("ANUMCL_{}_{}_{}{}", ver, os, arch, suffix)
+  format!("AHNUMCL_{}_{}_{}{}", ver, os, arch, suffix)
 }
 
 // Generate the new filename on the local disk.

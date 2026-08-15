@@ -65,11 +65,11 @@
       "settings": {
         "copyright": {
           "title": "Derechos de Autor",
-          "description": "Derechos de Autor © 2024-2026 ANU-MC y colaboradores de SJMCL."
+          "description": "Derechos de Autor © 2024-2026 AHNUMC y colaboradores de SJMCL."
         },
         "userAgreement": {
           "title": "Acuerdo de Usuario",
-          "url": "https://github.com/anu-mc/ANUMCL/blob/main/docs/USER_AGREEMENT.md"
+          "url": "https://github.com/ahnumc/AHNUMCL/blob/main/docs/USER_AGREEMENT.md"
         },
         "openSourceLicense": {
           "title": "Licencia de Código Abierto",
@@ -3227,11 +3227,11 @@
       "title": "¡Bienvenido!"
     },
     "body": {
-      "text": "¡Bienvenido a ANUMCL! Antes de comenzar, por favor asegúrate de leer y aceptar nuestro <terms>Acuerdo de Usuario</terms>."
+      "text": "¡Bienvenido a AHNUMCL! Antes de comenzar, por favor asegúrate de leer y aceptar nuestro <terms>Acuerdo de Usuario</terms>."
     },
     "warning": {
-      "unstableVersion": "Estás usando la versión {{versionLabel}} de ANUMCL. Algunas funciones pueden ser inestables o incompletas. Los reportes de errores y solicitudes de funciones son bienvenidos.",
-      "winArm64Notice": "ANUMCL ahora es compatible con Windows en Arm. Si estás usando una plataforma <b>QUALCOMM</b>, es posible que necesites instalar el <glpack>OpenGL Compatibility Pack</glpack> antes de iniciar el juego."
+      "unstableVersion": "Estás usando la versión {{versionLabel}} de AHNUMCL. Algunas funciones pueden ser inestables o incompletas. Los reportes de errores y solicitudes de funciones son bienvenidos.",
+      "winArm64Notice": "AHNUMCL ahora es compatible con Windows en Arm. Si estás usando una plataforma <b>QUALCOMM</b>, es posible que necesites instalar el <glpack>OpenGL Compatibility Pack</glpack> antes de iniciar el juego."
     },
     "button": {
       "agree": "Aceptar"

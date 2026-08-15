@@ -65,11 +65,11 @@
       "settings": {
         "copyright": {
           "title": "コピーライト",
-          "description": "© 2024-2026 ANU-MC and SJMCL contributors"
+          "description": "© 2024-2026 AHNUMC and SJMCL contributors"
         },
         "userAgreement": {
           "title": "利用規約",
-          "url": "https://github.com/anu-mc/ANUMCL/blob/main/docs/USER_AGREEMENT.md"
+          "url": "https://github.com/ahnumc/AHNUMCL/blob/main/docs/USER_AGREEMENT.md"
         },
         "openSourceLicense": {
           "title": "オープンソースライセンス",
@@ -3227,11 +3227,11 @@
       "title": "ようこそ！"
     },
     "body": {
-      "text": "ANUMCL をご利用いただき、ありがとうございます。開始前に、必ず下記の<terms>利用規約</terms>をお読みいただき、同意をお願いいたします。"
+      "text": "AHNUMCL をご利用いただき、ありがとうございます。開始前に、必ず下記の<terms>利用規約</terms>をお読みいただき、同意をお願いいたします。"
     },
     "warning": {
-      "unstableVersion": "{{versionLabel}}の ANUMCL を使用しています。一部の機能が不安定または開発未完了の可能性があります。使用上の問題や機能の提案を報告いただければ幸いです。",
-      "winArm64Notice": "ANUMCL は Windows on Arm プラットフォームに対応しました。<br/> <b>Qualcomm</b> プラットフォームをご利用の場合、ゲームを起動する前に <glpack>OpenGL 互換パック</glpack> のインストールが必要な場合があります。"
+      "unstableVersion": "{{versionLabel}}の AHNUMCL を使用しています。一部の機能が不安定または開発未完了の可能性があります。使用上の問題や機能の提案を報告いただければ幸いです。",
+      "winArm64Notice": "AHNUMCL は Windows on Arm プラットフォームに対応しました。<br/> <b>Qualcomm</b> プラットフォームをご利用の場合、ゲームを起動する前に <glpack>OpenGL 互換パック</glpack> のインストールが必要な場合があります。"
     },
     "button": {
       "agree": "同意して続ける"

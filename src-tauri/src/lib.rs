@@ -42,7 +42,10 @@ static IS_PORTABLE: LazyLock<bool> = LazyLock::new(|| is_portable().unwrap_or(fa
 static APP_DATA_DIR: OnceLock<PathBuf> = OnceLock::new();
 
 fn open_modpack_deeplink(handle: &tauri::AppHandle, path: &str) {
-  let deep_link = format!("anumcl://import-modpack?path={}", urlencoding::encode(path));
+  let deep_link = format!(
+    "ahnumcl://import-modpack?path={}",
+    urlencoding::encode(path)
+  );
   let _ = handle.opener().open_url(&deep_link, None::<&str>);
 }
 
@@ -65,7 +68,7 @@ pub async fn run() {
 
         // .mrpack file association (warm start)
         for arg in &args {
-          if arg.ends_with(".mrpack") && !arg.starts_with("anumcl://") {
+          if arg.ends_with(".mrpack") && !arg.starts_with("ahnumcl://") {
             open_modpack_deeplink(app, arg);
           }
         }
@@ -376,7 +379,7 @@ pub async fn run() {
             #[cfg(not(target_os = "macos"))]
             {
               for arg in std::env::args() {
-                if arg.ends_with(".mrpack") && !arg.starts_with("anumcl://") {
+                if arg.ends_with(".mrpack") && !arg.starts_with("ahnumcl://") {
                   open_modpack_deeplink(app_handle, &arg);
                   break;
                 }

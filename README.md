@@ -1,10 +1,10 @@
-# ANUMCL
+# AHNUMCL
 
-> ANUMCL is based on [SJMCL](https://github.com/UNIkeEN/SJMCL), and is distributed under GPLv3 with the upstream additional terms in [LICENSE.EXTRA](LICENSE.EXTRA).
+> AHNUMCL is based on [SJMCL](https://github.com/UNIkeEN/SJMCL), and is distributed under GPLv3 with the upstream additional terms in [LICENSE.EXTRA](LICENSE.EXTRA).
 
-[![Test Build](https://img.shields.io/github/actions/workflow/status/anu-mc/ANUMCL/test.yml?label=test%20build&logo=github&style=for-the-badge)](https://github.com/anu-mc/ANUMCL/blob/main/.github/workflows/test.yml)
-![Downloads](https://img.shields.io/github/downloads/anu-mc/ANUMCL/total?logo=github&style=for-the-badge)
-![Stars](https://img.shields.io/github/stars/anu-mc/ANUMCL?style=for-the-badge)
+[![Test Build](https://img.shields.io/github/actions/workflow/status/ahnumc/AHNUMCL/test.yml?label=test%20build&logo=github&style=for-the-badge)](https://github.com/ahnumc/AHNUMCL/blob/main/.github/workflows/test.yml)
+![Downloads](https://img.shields.io/github/downloads/ahnumc/AHNUMCL/total?logo=github&style=for-the-badge)
+![Stars](https://img.shields.io/github/stars/ahnumc/AHNUMCL?style=for-the-badge)
 
 **English** · [简体中文](docs/README.zh-Hans.md) · [繁體中文](docs/README.zh-Hant.md)
 
@@ -27,9 +27,9 @@
 
 ## Getting Started
 
-Download the latest ANUMCL release from [GitHub Releases](https://github.com/anu-mc/ANUMCL/releases).
+Download the latest AHNUMCL release from [GitHub Releases](https://github.com/ahnumc/AHNUMCL/releases).
 
-ANUMCL currently supports the following platforms:
+AHNUMCL currently supports the following platforms:
 
 | Platform  | Versions            | Architectures              | Provided Bundles                        |
 |-----------|---------------------|----------------------------|-----------------------------------------|
@@ -42,7 +42,7 @@ ANUMCL currently supports the following platforms:
 To get started, clone the repository and install the required dependencies:
 
 ```bash
-git clone https://github.com/anu-mc/ANUMCL.git
+git clone https://github.com/ahnumc/AHNUMCL.git
 pnpm install
 ```
 
@@ -55,12 +55,12 @@ pnpm tauri dev
 We warmly invite contributions from everyone. 
 
 * Before you get started, review the [Contributing Guide](CONTRIBUTING.md).
-* Report issues through [GitHub Issues](https://github.com/anu-mc/ANUMCL/issues).
+* Report issues through [GitHub Issues](https://github.com/ahnumc/AHNUMCL/issues).
 
 
 ## Copyright
 
-Copyright © 2024-2026 ANU-MC and SJMCL contributors.
+Copyright © 2024-2026 AHNUMC and SJMCL contributors.
 
 > NOT AN OFFICIAL MINECRAFT SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.
 

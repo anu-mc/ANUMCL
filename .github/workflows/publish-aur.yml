@@ -52,8 +52,8 @@ jobs:
               --jq ".assets[] | select(.name == \"${asset_name}\") | .digest"
           }
 
-          X86_64_DEB_DIGEST=$(get_asset_digest "ANUMCL_${{ inputs.version }}_linux_x86_64.deb")
-          AARCH64_DEB_DIGEST=$(get_asset_digest "ANUMCL_${{ inputs.version }}_linux_aarch64.deb")
+          X86_64_DEB_DIGEST=$(get_asset_digest "AHNUMCL_${{ inputs.version }}_linux_x86_64.deb")
+          AARCH64_DEB_DIGEST=$(get_asset_digest "AHNUMCL_${{ inputs.version }}_linux_aarch64.deb")
 
           if [[ -z "$X86_64_DEB_DIGEST" || -z "$AARCH64_DEB_DIGEST" ]]; then
             echo "Failed to read one or more release asset digests from GitHub."
@@ -122,7 +122,7 @@ jobs:
           echo "PKGBUILD generated with version ${VERSION//-/}"
           cat PKGBUILD
 
-      - name: Publish ANUMCL to the AUR
+      - name: Publish AHNUMCL to the AUR
         uses: KSXGitHub/github-actions-deploy-aur@v4.1.2
         with:
           pkgname: sjmcl-bin

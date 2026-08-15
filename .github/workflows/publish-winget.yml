@@ -52,9 +52,9 @@ jobs:
               --jq ".assets[] | select(.name == \"${asset_name}\") | .digest"
           }
 
-          X64_ASSET="ANUMCL_${VERSION}_windows_x86_64_setup.exe"
-          X86_ASSET="ANUMCL_${VERSION}_windows_i686_setup.exe"
-          ARM64_ASSET="ANUMCL_${VERSION}_windows_aarch64_setup.exe"
+          X64_ASSET="AHNUMCL_${VERSION}_windows_x86_64_setup.exe"
+          X86_ASSET="AHNUMCL_${VERSION}_windows_i686_setup.exe"
+          ARM64_ASSET="AHNUMCL_${VERSION}_windows_aarch64_setup.exe"
 
           X64_DIGEST=$(get_asset_digest "$X64_ASSET")
           X86_DIGEST=$(get_asset_digest "$X86_ASSET")

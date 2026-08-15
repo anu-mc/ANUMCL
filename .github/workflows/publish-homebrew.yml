@@ -55,16 +55,16 @@ jobs:
               --jq ".assets[] | select(.name == \"${asset_name}\") | .digest"
           }
 
-          ARM_DMG_DIGEST=$(get_asset_digest "ANUMCL_${VERSION}_macos_aarch64.dmg")
-          INTEL_DMG_DIGEST=$(get_asset_digest "ANUMCL_${VERSION}_macos_x86_64.dmg")
+          ARM_DMG_DIGEST=$(get_asset_digest "AHNUMCL_${VERSION}_macos_aarch64.dmg")
+          INTEL_DMG_DIGEST=$(get_asset_digest "AHNUMCL_${VERSION}_macos_x86_64.dmg")
 
           if [[ -z "$ARM_DMG_DIGEST" ]]; then
-            echo "Missing release asset digest: ANUMCL_${VERSION}_macos_aarch64.dmg"
+            echo "Missing release asset digest: AHNUMCL_${VERSION}_macos_aarch64.dmg"
             exit 1
           fi
 
           if [[ -z "$INTEL_DMG_DIGEST" ]]; then
-            echo "Missing release asset digest: ANUMCL_${VERSION}_macos_x86_64.dmg"
+            echo "Missing release asset digest: AHNUMCL_${VERSION}_macos_x86_64.dmg"
             exit 1
           fi
 

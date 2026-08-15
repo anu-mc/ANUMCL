@@ -37,7 +37,7 @@ const NotifyNewVersionModal: React.FC<NotifyNewVersionModalProps> = ({
 
   const handleDownloadUpdate = () => {
     if (isLinux) {
-      openUrl("https://github.com/anu-mc/ANUMCL/releases");
+      openUrl("https://github.com/ahnumc/AHNUMCL/releases");
     } else {
       ConfigService.downloadLauncherUpdate(newVersion).then((response) => {
         if (response.status !== "success") {

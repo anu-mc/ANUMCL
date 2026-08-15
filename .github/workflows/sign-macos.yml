@@ -84,7 +84,7 @@ jobs:
         if: steps.validate.outputs.should_sign == 'true'
         uses: actions/download-artifact@v4
         with:
-          name: ANUMCL_${{ inputs.version }}_macos_${{ matrix.arch }}
+          name: AHNUMCL_${{ inputs.version }}_macos_${{ matrix.arch }}
           path: artifacts
 
       - name: Setup signing environment
@@ -126,20 +126,20 @@ jobs:
           [ -f "$ENTITLEMENTS_PATH" ]
 
           # Extract the .app from tar.gz
-          tar -xzf ANUMCL_${{ inputs.version }}_macos_${{ matrix.arch }}.app.tar.gz
+          tar -xzf AHNUMCL_${{ inputs.version }}_macos_${{ matrix.arch }}.app.tar.gz
           
           # Sign the .app bundle
           codesign --deep --force --options runtime \
             --entitlements "$ENTITLEMENTS_PATH" \
             --sign "$SIGNING_IDENTITY" \
-            "ANUMCL.app"
+            "AHNUMCL.app"
           
           # Verify signing
-          codesign --verify --deep --strict --verbose=2 ANUMCL.app
+          codesign --verify --deep --strict --verbose=2 AHNUMCL.app
           
           # Re-compress the signed .app
-          rm ANUMCL_${{ inputs.version }}_macos_${{ matrix.arch }}.app.tar.gz
-          tar -czf ANUMCL_${{ inputs.version }}_macos_${{ matrix.arch }}.app.tar.gz ANUMCL.app
+          rm AHNUMCL_${{ inputs.version }}_macos_${{ matrix.arch }}.app.tar.gz
+          tar -czf AHNUMCL_${{ inputs.version }}_macos_${{ matrix.arch }}.app.tar.gz AHNUMCL.app
 
       - name: Create DMG configuration
         if: steps.validate.outputs.should_sign == 'true'
@@ -148,7 +148,7 @@ jobs:
           # Create appdmg configuration file
           cat > dmg-config.json << EOF
           {
-            "title": "ANUMCL Installer",
+            "title": "AHNUMCL Installer",
             "icon": "../src-tauri/assets/icons/dmg/volume.icns",
             "background": "../src-tauri/assets/misc/dmg_bg.png",
             "format": "UDZO",
@@ -164,7 +164,7 @@ jobs:
                 "x": 180,
                 "y": 170,
                 "type": "file",
-                "path": "ANUMCL.app"
+                "path": "AHNUMCL.app"
               },
               {
                 "x": 480,
@@ -183,20 +183,20 @@ jobs:
         working-directory: artifacts
         run: |
           # Remove the original DMG if it exists (build workflow no longer creates DMG)
-          rm -f ANUMCL_${{ inputs.version }}_macos_${{ matrix.arch }}.dmg
+          rm -f AHNUMCL_${{ inputs.version }}_macos_${{ matrix.arch }}.dmg
           
           # Create a new DMG with the signed app using appdmg
-          appdmg dmg-config.json ANUMCL_${{ inputs.version }}_macos_${{ matrix.arch }}.dmg
+          appdmg dmg-config.json AHNUMCL_${{ inputs.version }}_macos_${{ matrix.arch }}.dmg
           
           # Sign the new DMG
           codesign --force --sign "$SIGNING_IDENTITY" \
-            ANUMCL_${{ inputs.version }}_macos_${{ matrix.arch }}.dmg
+            AHNUMCL_${{ inputs.version }}_macos_${{ matrix.arch }}.dmg
           
           # Verify DMG signing
-          codesign --verify --deep --strict --verbose=2 ANUMCL_${{ inputs.version }}_macos_${{ matrix.arch }}.dmg
+          codesign --verify --deep --strict --verbose=2 AHNUMCL_${{ inputs.version }}_macos_${{ matrix.arch }}.dmg
           
           # Clean up extracted .app and config file
-          rm -rf ANUMCL.app dmg-config.json
+          rm -rf AHNUMCL.app dmg-config.json
 
       - name: Notarize .app
         if: steps.validate.outputs.should_sign == 'true'
@@ -207,25 +207,25 @@ jobs:
         working-directory: artifacts
         run: |
           # Extract .app for notarization
-          tar -xzf ANUMCL_${{ inputs.version }}_macos_${{ matrix.arch }}.app.tar.gz
+          tar -xzf AHNUMCL_${{ inputs.version }}_macos_${{ matrix.arch }}.app.tar.gz
           
           # Create zip for notarization
-          ditto -c -k --keepParent ANUMCL.app ANUMCL.zip
+          ditto -c -k --keepParent AHNUMCL.app AHNUMCL.zip
           
           # Submit for notarization
-          xcrun notarytool submit ANUMCL.zip \
+          xcrun notarytool submit AHNUMCL.zip \
             --apple-id "$NOTARY_APPLE_ID" \
             --password "$NOTARY_PASSWORD" \
             --team-id "$NOTARY_TEAM_ID" \
             --wait
           
           # Staple the notarization
-          xcrun stapler staple ANUMCL.app
+          xcrun stapler staple AHNUMCL.app
           
           # Re-compress the notarized .app
-          rm ANUMCL_${{ inputs.version }}_macos_${{ matrix.arch }}.app.tar.gz ANUMCL.zip
-          tar -czf ANUMCL_${{ inputs.version }}_macos_${{ matrix.arch }}.app.tar.gz ANUMCL.app
-          rm -rf ANUMCL.app
+          rm AHNUMCL_${{ inputs.version }}_macos_${{ matrix.arch }}.app.tar.gz AHNUMCL.zip
+          tar -czf AHNUMCL_${{ inputs.version }}_macos_${{ matrix.arch }}.app.tar.gz AHNUMCL.app
+          rm -rf AHNUMCL.app
 
       - name: Notarize DMG
         if: steps.validate.outputs.should_sign == 'true'
@@ -236,37 +236,37 @@ jobs:
         working-directory: artifacts
         run: |
           # Submit DMG for notarization
-          xcrun notarytool submit ANUMCL_${{ inputs.version }}_macos_${{ matrix.arch }}.dmg \
+          xcrun notarytool submit AHNUMCL_${{ inputs.version }}_macos_${{ matrix.arch }}.dmg \
             --apple-id "$NOTARY_APPLE_ID" \
             --password "$NOTARY_PASSWORD" \
             --team-id "$NOTARY_TEAM_ID" \
             --wait
           
           # Staple the notarization to DMG
-          xcrun stapler staple ANUMCL_${{ inputs.version }}_macos_${{ matrix.arch }}.dmg
+          xcrun stapler staple AHNUMCL_${{ inputs.version }}_macos_${{ matrix.arch }}.dmg
 
       - name: Verify notarization
         if: steps.validate.outputs.should_sign == 'true'
         working-directory: artifacts
         run: |
           # Extract the notarized .app for verification
-          tar -xzf ANUMCL_${{ inputs.version }}_macos_${{ matrix.arch }}.app.tar.gz
+          tar -xzf AHNUMCL_${{ inputs.version }}_macos_${{ matrix.arch }}.app.tar.gz
           
           echo "=== Testing Gatekeeper assessment on notarized app ==="
-          spctl --verbose=4 --assess --type execute ANUMCL.app
+          spctl --verbose=4 --assess --type execute AHNUMCL.app
           
           echo "=== Final signature verification ==="
-          codesign --verify --deep --strict --verbose=2 ANUMCL.app
+          codesign --verify --deep --strict --verbose=2 AHNUMCL.app
 
       - name: Calculate SHA256
         if: steps.validate.outputs.should_sign == 'true'
         working-directory: artifacts
         run: |
-          CORE_EXECUTABLE="ANUMCL.app/Contents/MacOS/ANUMCL"
+          CORE_EXECUTABLE="AHNUMCL.app/Contents/MacOS/AHNUMCL"
           if [ -f "$CORE_EXECUTABLE" ]; then
             EXECUTABLE_SHA256=$(shasum -a 256 "$CORE_EXECUTABLE" | awk '{print $1}')
             echo "Signed core executable SHA256: $EXECUTABLE_SHA256"
-            ARTIFACT_NAME="ANUMCL_${{ inputs.version }}_macos_${{ matrix.arch }}_signed"
+            ARTIFACT_NAME="AHNUMCL_${{ inputs.version }}_macos_${{ matrix.arch }}_signed"
             echo "$EXECUTABLE_SHA256  $ARTIFACT_NAME" > "$ARTIFACT_NAME.sha256"
           fi
 
@@ -274,7 +274,7 @@ jobs:
         if: steps.validate.outputs.should_sign == 'true'
         working-directory: artifacts
         run: |
-          rm -rf ANUMCL.app
+          rm -rf AHNUMCL.app
           ls -la .
 
       - name: Cleanup keychain
@@ -289,6 +289,6 @@ jobs:
         if: steps.validate.outputs.should_sign == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: ANUMCL_${{ inputs.version }}_macos_${{ matrix.arch }}_signed
+          name: AHNUMCL_${{ inputs.version }}_macos_${{ matrix.arch }}_signed
           path: artifacts/*
           if-no-files-found: error

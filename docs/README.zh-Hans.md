@@ -1,10 +1,10 @@
-# ANUMCL
+# AHNUMCL
 
-> ANUMCL 基于 [SJMCL](https://github.com/UNIkeEN/SJMCL) 开发，并依据 GPLv3 及上游 [附加条款](../LICENSE.EXTRA) 发布。
+> AHNUMCL 基于 [SJMCL](https://github.com/UNIkeEN/SJMCL) 开发，并依据 GPLv3 及上游 [附加条款](../LICENSE.EXTRA) 发布。
 
-[![Test Build](https://img.shields.io/github/actions/workflow/status/anu-mc/ANUMCL/test.yml?label=test%20build&logo=github&style=for-the-badge)](https://github.com/anu-mc/ANUMCL/blob/main/.github/workflows/test.yml)
-![Downloads](https://img.shields.io/github/downloads/anu-mc/ANUMCL/total?logo=github&style=for-the-badge)
-![Stars](https://img.shields.io/github/stars/anu-mc/ANUMCL?style=for-the-badge)
+[![Test Build](https://img.shields.io/github/actions/workflow/status/ahnumc/AHNUMCL/test.yml?label=test%20build&logo=github&style=for-the-badge)](https://github.com/ahnumc/AHNUMCL/blob/main/.github/workflows/test.yml)
+![Downloads](https://img.shields.io/github/downloads/ahnumc/AHNUMCL/total?logo=github&style=for-the-badge)
+![Stars](https://img.shields.io/github/stars/ahnumc/AHNUMCL?style=for-the-badge)
 
 [English](../README.md) · **简体中文** · [繁體中文](README.zh-Hant.md)
 
@@ -21,7 +21,7 @@
 
 ## 开始使用
 
-请从 [ANUMCL Releases](https://github.com/anu-mc/ANUMCL/releases) 下载最新版本。
+请从 [AHNUMCL Releases](https://github.com/ahnumc/AHNUMCL/releases) 下载最新版本。
 
 | 平台 | 系统版本 | 架构 | 提供的分发类型 |
 | --- | --- | --- | --- |
@@ -36,8 +36,8 @@
 克隆本项目并安装前端依赖：
 
 ```bash
-git clone https://github.com/anu-mc/ANUMCL.git
-cd ANUMCL
+git clone https://github.com/ahnumc/AHNUMCL.git
+cd AHNUMCL
 pnpm install
 ```
 
@@ -47,11 +47,11 @@ pnpm install
 pnpm tauri dev
 ```
 
-请通过 [Pull Requests](https://github.com/anu-mc/ANUMCL/pulls) 或 [Issues](https://github.com/anu-mc/ANUMCL/issues) 参与贡献。
+请通过 [Pull Requests](https://github.com/ahnumc/AHNUMCL/pulls) 或 [Issues](https://github.com/ahnumc/AHNUMCL/issues) 参与贡献。
 
 ## 版权与许可
 
-版权所有 © 2024-2026 ANU-MC 和 SJMCL 贡献者。
+版权所有 © 2024-2026 AHNUMC 和 SJMCL 贡献者。
 
 > 本软件并非官方 Minecraft 服务，未获得 Mojang 或 Microsoft 批准或关联许可。
 

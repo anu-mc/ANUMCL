@@ -65,11 +65,11 @@
       "settings": {
         "copyright": {
           "title": "版權",
-          "description": "持權所有 © 2024-2026 ANU-MC 與 SJMCL 貢獻諸君。"
+          "description": "持權所有 © 2024-2026 AHNUMC 與 SJMCL 貢獻諸君。"
         },
         "userAgreement": {
           "title": "客契",
-          "url": "https://github.com/anu-mc/ANUMCL/blob/main/docs/USER_AGREEMENT.md"
+          "url": "https://github.com/ahnumc/AHNUMCL/blob/main/docs/USER_AGREEMENT.md"
         },
         "openSourceLicense": {
           "title": "開源之約",
@@ -3227,11 +3227,11 @@
       "title": "歡迎！"
     },
     "body": {
-      "text": "歡迎使用 ANUMCL！在始使用之前，請務必閱讀並許我們的<terms>客契</terms>。"
+      "text": "歡迎使用 AHNUMCL！在始使用之前，請務必閱讀並許我們的<terms>客契</terms>。"
     },
     "warning": {
-      "unstableVersion": "您方使用{{versionLabel}}的 ANUMCL，部分功用或不穩定或未開發畢，歡迎報告使用問題與功用薦。",
-      "winArm64Notice": "ANUMCL 現已支援 Windows on Arm 平臺。<br/>如您方使用 <b>高通</b> 平臺，您或須置 <glpack>OpenGL 相容包</glpack> 後才能進行戲。"
+      "unstableVersion": "您方使用{{versionLabel}}的 AHNUMCL，部分功用或不穩定或未開發畢，歡迎報告使用問題與功用薦。",
+      "winArm64Notice": "AHNUMCL 現已支援 Windows on Arm 平臺。<br/>如您方使用 <b>高通</b> 平臺，您或須置 <glpack>OpenGL 相容包</glpack> 後才能進行戲。"
     },
     "button": {
       "agree": "許並續"

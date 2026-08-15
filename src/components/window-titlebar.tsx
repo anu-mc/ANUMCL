@@ -229,7 +229,7 @@ const WindowTitlebar = () => {
         <MainWindowExtensionTitle />
       )}
       <Flex
-        id="anumcl-window-drag-region"
+        id="ahnumcl-window-drag-region"
         data-tauri-drag-region
         flex="1"
         h="100%"
@@ -238,7 +238,7 @@ const WindowTitlebar = () => {
         {(isWindows || isLinux) && (
           <Image
             src="/images/icons/Logo_32x32.png"
-            alt="ANUMCL"
+            alt="AHNUMCL"
             boxSize="16px"
           />
         )}
@@ -255,7 +255,7 @@ const WindowTitlebar = () => {
       </Flex>
       {isWindows && (
         <HStack
-          id="anumcl-window-decorum-host"
+          id="ahnumcl-window-decorum-host"
           data-tauri-decorum-tb
           spacing={0}
           h="100%"

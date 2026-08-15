@@ -107,7 +107,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                 <Link
                   color={`${primaryColor}.500`}
                   onClick={() =>
-                    openUrl("https://github.com/anu-mc/ANUMCL/issues")
+                    openUrl("https://github.com/ahnumc/AHNUMCL/issues")
                   }
                 />
               ),
@@ -115,7 +115,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                 <Link
                   color={`${primaryColor}.500`}
                   onClick={() =>
-                    openUrl("https://github.com/anu-mc/ANUMCL/issues")
+                    openUrl("https://github.com/ahnumc/AHNUMCL/issues")
                   }
                 />
               ),

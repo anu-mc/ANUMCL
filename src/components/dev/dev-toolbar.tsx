@@ -84,9 +84,9 @@ const DevToolbarContent: React.FC = () => {
           }
           break;
         case "deeplink": {
-          const deeplink = trimmedPath.startsWith("anumcl://")
+          const deeplink = trimmedPath.startsWith("ahnumcl://")
             ? trimmedPath
-            : `anumcl://${trimmedPath}`;
+            : `ahnumcl://${trimmedPath}`;
           emitDeepLink([deeplink]);
           setInputValue("");
           break;
@@ -161,7 +161,7 @@ const DevToolbarContent: React.FC = () => {
           inputType === "route"
             ? ""
             : inputType === "deeplink"
-              ? "anumcl://..."
+              ? "ahnumcl://..."
               : "key(:params)"
         }
       />

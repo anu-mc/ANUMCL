@@ -1,5 +1,5 @@
 {
-  "identifier": "io.github.anu-mc.anumcl",
+  "identifier": "io.github.ahnumc.ahnumcl",
   "bundle": {
     "windows": {
       "nsis": {
@@ -21,7 +21,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "ANUMCL",
+        "title": "AHNUMCL",
         "url": "/",
         "width": 820,
         "height": 550,

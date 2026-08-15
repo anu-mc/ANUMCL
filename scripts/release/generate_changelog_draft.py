@@ -3,8 +3,8 @@ import re
 import os
 from packaging.version import Version
 
-OWNER = "anu-mc"
-REPO = "ANUMCL"
+OWNER = "ahnumc"
+REPO = "AHNUMCL"
 TAG_PATTERN = re.compile(r"^v(.+)$")  # 版本号以v开始
 
 def get_emoji(msg):

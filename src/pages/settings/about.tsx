@@ -107,14 +107,14 @@ const AboutSettingsPage = () => {
           title: t("AboutSettingsPage.about.settings.sourceCode.title"),
           children: (
             <CommonIconButton
-              label="https://github.com/anu-mc/ANUMCL"
+              label="https://github.com/ahnumc/AHNUMCL"
               icon="external"
               withTooltip
               tooltipPlacement="bottom-end"
               size="xs"
               h={18}
               onClick={() => {
-                openUrl("https://github.com/anu-mc/ANUMCL");
+                openUrl("https://github.com/ahnumc/AHNUMCL");
               }}
             />
           ),

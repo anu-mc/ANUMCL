@@ -144,11 +144,11 @@ jobs:
           mkdir -p artifacts
           SHORT_SHA="${GITHUB_SHA:0:7}"
           if [ "${{ matrix.platform }}" = "windows-latest" ]; then
-            OUTPUT_NAME="ANUMCL_${SHORT_SHA}_windows_x86_64_portable.exe"
-            python scripts/release/bundle_portable_assets.py -p "src-tauri/target/test-build/" -o "$OUTPUT_NAME" "ANUMCL.exe"
+            OUTPUT_NAME="AHNUMCL_${SHORT_SHA}_windows_x86_64_portable.exe"
+            python scripts/release/bundle_portable_assets.py -p "src-tauri/target/test-build/" -o "$OUTPUT_NAME" "AHNUMCL.exe"
           else
-            OUTPUT_NAME="ANUMCL_${SHORT_SHA}_linux_x86_64_portable"
-            python scripts/release/bundle_portable_assets.py -p "src-tauri/target/test-build/" -o "$OUTPUT_NAME" "ANUMCL"
+            OUTPUT_NAME="AHNUMCL_${SHORT_SHA}_linux_x86_64_portable"
+            python scripts/release/bundle_portable_assets.py -p "src-tauri/target/test-build/" -o "$OUTPUT_NAME" "AHNUMCL"
           fi
           cp "src-tauri/target/test-build/$OUTPUT_NAME" artifacts/
           echo "output_name=$OUTPUT_NAME" >> "$GITHUB_OUTPUT"

@@ -1,5 +1,5 @@
 {
-  "identifier": "io.github.anu-mc.anumcl",
+  "identifier": "io.github.ahnumc.ahnumcl",
   "bundle": {
     "resources": {
       "infoplist": ""
@@ -19,7 +19,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "ANUMCL",
+        "title": "AHNUMCL",
         "url": "/",
         "width": 800,
         "height": 550,
