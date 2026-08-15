@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "AHNUMCL",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "identifier": "io.github.ahnumc.ahnumcl",
   "build": {
     "frontendDist": "../out",
@@ -61,8 +61,7 @@
       "assets/icons/icon.ico": "assets/icons/icon.ico",
       "assets/icons/icon.png": "assets/icons/icon.png",
       "assets/icons/variants/square.png": "assets/icons/variants/square.png",
-      "assets/db/*": "assets/db/",
-      "target/release/WebView2Loader.dll": "WebView2Loader.dll"
+      "assets/db/*": "assets/db/"
     }
   },
   "plugins": {
