@@ -195,7 +195,7 @@
         "title": "Options avancées",
         "uuid": {
           "label": "UUID",
-          "placeholder": "(Généré automatiquement par SJMCL)",
+          "placeholder": "(Généré automatiquement par AHNUMCL)",
           "errorMessage": "Format UUID incorrect"
         }
       }
@@ -224,7 +224,7 @@
       "description": {
         "start": {
           "3rdparty": "Cette source d'authentification prend en charge la proposition Yggdrasil Connect",
-          "microsoft": "SJMCL prend en charge le flux d'autorisation d'appareil OAuth 2.0 de Microsoft"
+          "microsoft": "AHNUMCL prend en charge le flux d'autorisation d'appareil OAuth 2.0 de Microsoft"
         },
         "next": "Veuillez cliquer sur le bouton Continuer la connexion pour ouvrir la fenêtre de connexion et saisir le code ci-dessus (déjà copié)"
       },
@@ -548,7 +548,7 @@
       "type": "Type"
     },
     "warning": {
-      "mojang": "Le runtime Java distribué par Mojang sera installé par SJMCL dans un répertoire spécifique.",
+      "mojang": "Le runtime Java distribué par Mojang sera installé par AHNUMCL dans un répertoire spécifique.",
       "oracle": "Le téléchargement à partir de la source Oracle peut nécessiter une connexion."
     }
   },
@@ -867,10 +867,10 @@
     "title": "Paramètres de {{name}}"
   },
   "ExtensionSettingsPage": {
-    "alert": "SJMCL ne peut pas contrôler le comportement des extensions tierces, y compris la manière dont elles traitent vos données personnelles. N'installez et n'activez que des extensions provenant de sources fiables.",
+    "alert": "AHNUMCL ne peut pas contrôler le comportement des extensions tierces, y compris la manière dont elles traitent vos données personnelles. N'installez et n'activez que des extensions provenant de sources fiables.",
     "fileDnD": {
-      "title": "Installer une extension SJMCL",
-      "desc": "Installer le fichier d'extension {{fileName}} dans SJMCL"
+      "title": "Installer une extension AHNUMCL",
+      "desc": "Installer le fichier d'extension {{fileName}} dans AHNUMCL"
     },
     "installed": "Extensions installées",
     "menu": {
@@ -1298,14 +1298,14 @@
         "directories": {
           "special": {
             "CURRENT_DIR": "Dossier actuel",
-            "APP_DATA_SUBDIR": "Dossier de données SJMCL",
+            "APP_DATA_SUBDIR": "Dossier de données AHNUMCL",
             "OFFICIAL_DIR": "Dossier du lanceur officiel"
           }
         }
       },
       "deleteDialog": {
         "title": "Supprimer le répertoire du jeu",
-        "content": "Êtes-vous sûr de vouloir supprimer le répertoire du jeu {{dirName}} ? (SJMCL ne le scannera plus, mais les fichiers ne seront pas supprimés du disque)"
+        "content": "Êtes-vous sûr de vouloir supprimer le répertoire du jeu {{dirName}} ? (AHNUMCL ne le scannera plus, mais les fichiers ne seront pas supprimés du disque)"
       },
       "directoryNotExist": "Ce répertoire n'existe pas, veuillez le supprimer et l'ajouter à nouveau"
     },
@@ -1463,7 +1463,7 @@
     "top": {
       "settings": {
         "LauncherDocs": {
-          "title": "Documentation du lanceur SJMC",
+          "title": "Documentation AHNUMCL",
           "url": "https://mc.sjtu.cn/sjmcl/en/docs"
         },
         "UserGroup": {
@@ -1694,7 +1694,7 @@
     }
   },
   "IntelligenceSettingsPage": {
-    "title": "Intelligence SJMCL",
+    "title": "Intelligence AHNUMCL",
     "description": "Intégrez des modèles d'IA à votre lanceur et à votre expérience de jeu Minecraft.",
     "mcpServer": {
       "title": "Service MCP",
@@ -1736,7 +1736,7 @@
     },
     "confirmDelete": {
       "title": "Supprimer Java",
-      "description": "Êtes-vous sûr de vouloir supprimer cette version de Java ? (SJMCL ne pourra plus l'utiliser pour lancer le jeu, mais les fichiers ne seront pas supprimés du disque)"
+      "description": "Êtes-vous sûr de vouloir supprimer cette version de Java ? (AHNUMCL ne pourra plus l'utiliser pour lancer le jeu, mais les fichiers ne seront pas supprimés du disque)"
     }
   },
   "LanguageMenu": {
@@ -1753,7 +1753,7 @@
   "LastExitedAbnormallyDialog": {
     "dialog": {
       "title": "La dernière exécution s'est terminée anormalement",
-      "content": "SJMCL s'est terminé anormalement lors de la dernière exécution. Vous pouvez envoyer les journaux à la <community>communauté</community> ou ouvrir une issue sur <github>GitHub</github> pour obtenir de l'aide.",
+      "content": "AHNUMCL s'est terminé anormalement lors de la dernière exécution. Vous pouvez envoyer les journaux à la <community>communauté</community> ou ouvrir une issue sur <github>GitHub</github> pour obtenir de l'aide.",
       "viewLog": "Voir les journaux"
     }
   },
@@ -1800,7 +1800,7 @@
   "MainLayout": {
     "fileDnD": {
       "title": "Importer un modpack",
-      "desc": "Importer le fichier de modpack {{fileName}} dans SJMCL"
+      "desc": "Importer le fichier de modpack {{fileName}} dans AHNUMCL"
     }
   },
   "ManageSkinModal": {
@@ -2255,8 +2255,8 @@
   },
   "RestartForUpdateConfirmDialog": {
     "title": "Mise à jour du lanceur",
-    "body": "La nouvelle version a été téléchargée. Redémarrez SJMCL pour finaliser la mise à jour.",
-    "bodyWinInstaller": "La nouvelle version a été téléchargée. Cliquer sur « Installer » fermera SJMCL et exécutera le programme d'installation.",
+    "body": "La nouvelle version a été téléchargée. Redémarrez AHNUMCL pour finaliser la mise à jour.",
+    "bodyWinInstaller": "La nouvelle version a été téléchargée. Cliquer sur « Installer » fermera AHNUMCL et exécutera le programme d'installation.",
     "button": {
       "restart": "Redémarrer",
       "install": "Installer",
@@ -3174,7 +3174,7 @@
     "header": {
       "title": "Étoilez-nous sur GitHub !"
     },
-    "body": "Si vous aimez SJMCL et souhaitez nous soutenir, pouvez-vous nous donner une étoile sur GitHub ? Ce petit geste compte beaucoup pour nous et nous motive à continuer à améliorer l'expérience.",
+    "body": "Si vous aimez AHNUMCL et souhaitez nous soutenir, pouvez-vous nous donner une étoile sur GitHub ? Ce petit geste compte beaucoup pour nous et nous motive à continuer à améliorer l'expérience.",
     "button": {
       "later": "Plus tard",
       "starUs": "Étoiler"
@@ -3208,7 +3208,7 @@
   "UnavailableExePathAlertDialog": {
     "dialog": {
       "title": "Chemin d'exécution non sûr",
-      "content": "SJMCL est actuellement exécuté depuis un répertoire temporaire ou invalide. Vos paramètres et données de jeu peuvent être perdus. Veuillez déplacer SJMCL vers un autre emplacement et le relancer.",
+      "content": "AHNUMCL est actuellement exécuté depuis un répertoire temporaire ou invalide. Vos paramètres et données de jeu peuvent être perdus. Veuillez déplacer AHNUMCL vers un autre emplacement et le relancer.",
       "btnContinue": "Continuer quand même"
     }
   },

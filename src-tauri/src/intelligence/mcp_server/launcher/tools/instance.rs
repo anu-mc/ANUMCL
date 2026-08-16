@@ -125,13 +125,13 @@ pub fn tool_routes() -> Vec<ToolRoute<McpContext>> {
           ],
           "customIconSrc": "custom",
           "customIconDescription": "`custom` displays the custom icon file from the instance root.",
-          "automaticDefaultDescription": "When `create_instance.icon_src` is omitted, SJMCL chooses a default icon from OptiFine, the selected mod loader, or the game version type.",
+          "automaticDefaultDescription": "When `create_instance.icon_src` is omitted, AHNUMCL chooses a default icon from OptiFine, the selected mod loader, or the game version type.",
         }))
       }
     ),
     mcp_tool!(
       "create_instance",
-      "Create a Minecraft instance and schedule required client/mod-loader downloads. Resolves game and loader metadata from version IDs. Use `retrieve_instance_icon_options` when choosing a manual `icon_src`. If `icon_src` is omitted, SJMCL chooses a default icon from OptiFine, the selected mod loader, or the game version type.",
+      "Create a Minecraft instance and schedule required client/mod-loader downloads. Resolves game and loader metadata from version IDs. Use `retrieve_instance_icon_options` when choosing a manual `icon_src`. If `icon_src` is omitted, AHNUMCL chooses a default icon from OptiFine, the selected mod loader, or the game version type.",
       |app, params|
       #[serde(deny_unknown_fields)]
       {
@@ -143,7 +143,7 @@ pub fn tool_routes() -> Vec<ToolRoute<McpContext>> {
         name: String,
         #[schemars(description = "Optional instance description. Defaults to an empty string.")]
         description: Option<String>,
-        #[schemars(description = "Optional instance icon source. Omit to let SJMCL pick automatically: OptiFine uses its icon; Fabric, Forge/LegacyForge, NeoForge, and Quilt use their matching icons; otherwise snapshots, old beta, April Fools versions, and releases use their game version type icons. To choose a built-in icon manually, call `retrieve_instance_icon_options` and use one item from `builtinIconPaths`. Pass `custom` only when the instance root already has a custom icon file to display.")]
+        #[schemars(description = "Optional instance icon source. Omit to let AHNUMCL pick automatically: OptiFine uses its icon; Fabric, Forge/LegacyForge, NeoForge, and Quilt use their matching icons; otherwise snapshots, old beta, April Fools versions, and releases use their game version type icons. To choose a built-in icon manually, call `retrieve_instance_icon_options` and use one item from `builtinIconPaths`. Pass `custom` only when the instance root already has a custom icon file to display.")]
         icon_src: Option<String>,
         #[schemars(description = "Minecraft game version ID, for example `1.21.5`.")]
         game_version: String,

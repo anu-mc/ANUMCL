@@ -32,12 +32,12 @@ impl ServerHandler for McpContext {
   fn get_info(&self) -> ServerInfo {
     ServerInfo::new(ServerCapabilities::builder().enable_tools().build())
       .with_server_info(
-        Implementation::new("sjmcl-mcp", env!("CARGO_PKG_VERSION"))
-          .with_title("SJMCL MCP")
-          .with_description("MCP tools exposed by SJMCL, a modern Minecraft launcher"),
+        Implementation::new("ahnumcl-mcp", env!("CARGO_PKG_VERSION"))
+          .with_title("AHNUMCL MCP")
+          .with_description("MCP tools exposed by AHNUMCL, a modern Minecraft launcher"),
       )
       .with_instructions(
-        "Use tools to query Minecraft instances and accounts managed by SJMC Launcher. When a tool requires instance_id, first list available instances and then pass one returned id. This server is intended for local trusted clients."
+        "Use tools to query Minecraft instances and accounts managed by AHNUMCL. When a tool requires instance_id, first list available instances and then pass one returned id. This server is intended for local trusted clients."
       )
   }
 }

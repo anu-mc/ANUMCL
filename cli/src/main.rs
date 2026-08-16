@@ -17,12 +17,12 @@ const DEFAULT_PORT: u16 = 18970;
 const DEFAULT_CONNECT_TIMEOUT_MS: u64 = 5000;
 const RETRY_INTERVAL_MS: u64 = 250;
 
-const EXPECTED_SERVER_NAME: &str = "sjmcl-mcp";
+const EXPECTED_SERVER_NAME: &str = "ahnumcl-mcp";
 const MCP_SERVER_HOST: &str = "127.0.0.1";
 const MCP_SERVER_PATH: &str = "/mcp";
-const RUN_SJMCL_DEEPLINK: &str = "sjmcl://run-silently";
+const RUN_AHNUMCL_DEEPLINK: &str = "ahnumcl://run-silently";
 const ENABLE_MCP_HINT: &str =
-  "Please enable Launcher MCP Server in SJMCL - Intelligence to use the CLI.\nIf your MCP server uses a port other than the default 18970, run the CLI with `-p <port>`.";
+  "Please enable Launcher MCP Server in AHNUMCL - Intelligence to use the CLI.\nIf your MCP server uses a port other than the default 18970, run the CLI with `-p <port>`.";
 
 #[derive(Clone)]
 struct CliOptions {
@@ -166,7 +166,7 @@ async fn connect_launcher(options: &CliOptions) -> Result<LauncherClient, String
   match try_connect(options.port).await {
     Ok(client) => Ok(client),
     Err(initial_err) => {
-      run_sjmcl_deeplink()?;
+      run_ahnumcl_deeplink()?;
 
       let deadline = Instant::now() + std::time::Duration::from_millis(DEFAULT_CONNECT_TIMEOUT_MS);
       let mut last_error = initial_err;
@@ -201,7 +201,7 @@ async fn try_connect(port: u16) -> Result<LauncherClient, String> {
     let actual_name = server_info.server_info.name.clone();
     let _ = client.cancel().await;
     return Err(format!(
-      "endpoint {endpoint} is not the SJMCL MCP server (got `{actual_name}`)"
+      "endpoint {endpoint} is not the AHNUMCL MCP server (got `{actual_name}`)"
     ));
   }
 
@@ -209,11 +209,11 @@ async fn try_connect(port: u16) -> Result<LauncherClient, String> {
 }
 
 fn print_help(tools: Option<&[Tool]>, hint: Option<&str>) {
-  println!("SJMCL CLI {}", env!("CARGO_PKG_VERSION"));
+  println!("AHNUMCL CLI {}", env!("CARGO_PKG_VERSION"));
   println!();
   println!("Usage:");
-  println!("  sjmcl-cli -h | --help");
-  println!("  sjmcl-cli [-p | --port <port>] <tool> [json-object]");
+  println!("  ahnumcl-cli -h | --help");
+  println!("  ahnumcl-cli [-p | --port <port>] <tool> [json-object]");
 
   if let Some(hint) = hint {
     println!();
@@ -320,37 +320,37 @@ fn parse_tool_arguments(args: &[String]) -> Result<Map<String, Value>, String> {
     .ok_or_else(|| "tool arguments must be a JSON object".to_string())
 }
 
-fn run_sjmcl_deeplink() -> Result<(), String> {
+fn run_ahnumcl_deeplink() -> Result<(), String> {
   #[cfg(target_os = "macos")]
   let mut command = {
     let mut command = Command::new("open");
-    command.arg(RUN_SJMCL_DEEPLINK);
+    command.arg(RUN_AHNUMCL_DEEPLINK);
     command
   };
 
   #[cfg(target_os = "linux")]
   let mut command = {
     let mut command = Command::new("xdg-open");
-    command.arg(RUN_SJMCL_DEEPLINK);
+    command.arg(RUN_AHNUMCL_DEEPLINK);
     command
   };
 
   #[cfg(target_os = "windows")]
   let mut command = {
     let mut command = Command::new("cmd");
-    command.args(["/C", "start", "", RUN_SJMCL_DEEPLINK]);
+    command.args(["/C", "start", "", RUN_AHNUMCL_DEEPLINK]);
     command
   };
 
   command
     .status()
-    .map_err(|err| format!("failed to open deeplink `{RUN_SJMCL_DEEPLINK}`: {err}"))
+    .map_err(|err| format!("failed to open deeplink `{RUN_AHNUMCL_DEEPLINK}`: {err}"))
     .and_then(|status| {
       if status.success() {
         Ok(())
       } else {
         Err(format!(
-          "deeplink launcher exited with status {} for `{RUN_SJMCL_DEEPLINK}`",
+          "deeplink launcher exited with status {} for `{RUN_AHNUMCL_DEEPLINK}`",
           status
         ))
       }

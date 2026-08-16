@@ -195,7 +195,7 @@
         "title": "高階選項",
         "uuid": {
           "label": "UUID",
-          "placeholder": "（由 SJMCL 自動生成）",
+          "placeholder": "（由 AHNUMCL 自動生成）",
           "errorMessage": "UUID 格式不正確"
         }
       }
@@ -224,7 +224,7 @@
       "description": {
         "start": {
           "3rdparty": "此認證源支援 Yggdrasil Connect 規範提案",
-          "microsoft": "SJMCL 支援微軟 OAuth 2.0 裝置許可權授予流"
+          "microsoft": "AHNUMCL 支援微軟 OAuth 2.0 裝置許可權授予流"
         },
         "next": "請點選繼續登入按鈕跳轉登入頁面，輸入以上程式碼（已自動複製）"
       },
@@ -548,7 +548,7 @@
       "type": "類型"
     },
     "warning": {
-      "mojang": "由 Mojang 分發的 Java 執行時將由 SJMCL 安裝到特定目錄",
+      "mojang": "由 Mojang 分發的 Java 執行時將由 AHNUMCL 安裝到特定目錄",
       "oracle": "從 Oracle 源下載可能需要登入"
     }
   },
@@ -867,10 +867,10 @@
     "title": "{{name}} 設定"
   },
   "ExtensionSettingsPage": {
-    "alert": "SJMCL 無法控制第三方擴充套件的行為，包括它們如何處理你的個人資料。請僅安裝並啟用來自可信來源的擴充套件。",
+    "alert": "AHNUMCL 無法控制第三方擴充套件的行為，包括它們如何處理你的個人資料。請僅安裝並啟用來自可信來源的擴充套件。",
     "fileDnD": {
-      "title": "安裝 SJMCL 擴充套件",
-      "desc": "將擴充套件檔案 {{fileName}} 安裝到 SJMCL"
+      "title": "安裝 AHNUMCL 擴充套件",
+      "desc": "將擴充套件檔案 {{fileName}} 安裝到 AHNUMCL"
     },
     "installed": "已安裝擴充套件",
     "menu": {
@@ -1298,14 +1298,14 @@
         "directories": {
           "special": {
             "CURRENT_DIR": "目前目錄",
-            "APP_DATA_SUBDIR": "SJMCL 資料目錄",
+            "APP_DATA_SUBDIR": "AHNUMCL 資料目錄",
             "OFFICIAL_DIR": "官方啟動器目錄"
           }
         }
       },
       "deleteDialog": {
         "title": "刪除遊戲目錄",
-        "content": "確定要刪除遊戲目錄 {{dirName}} 嗎？（SJMCL 將不會掃描此目錄，但不會刪除硬碟上的檔案）"
+        "content": "確定要刪除遊戲目錄 {{dirName}} 嗎？（AHNUMCL 將不會掃描此目錄，但不會刪除硬碟上的檔案）"
       },
       "directoryNotExist": "該目錄不存在，請刪除並重新新增"
     },
@@ -1463,7 +1463,7 @@
     "top": {
       "settings": {
         "LauncherDocs": {
-          "title": "SJMC Launcher 文件",
+          "title": "AHNUMCL 文件",
           "url": "https://mc.sjtu.cn/sjmcl/docs"
         },
         "UserGroup": {
@@ -1694,7 +1694,7 @@
     }
   },
   "IntelligenceSettingsPage": {
-    "title": "SJMCL 智慧",
+    "title": "AHNUMCL 智慧",
     "description": "將 AI 模型整合到你的啟動器與 Minecraft 遊玩體驗中。",
     "mcpServer": {
       "title": "MCP 服務",
@@ -1736,7 +1736,7 @@
     },
     "confirmDelete": {
       "title": "移除 Java",
-      "description": "確認要移除此版本 Java 嗎？（SJMCL 將無法使用此 Java 啟動遊戲，但不會刪除硬碟上的檔案）"
+      "description": "確認要移除此版本 Java 嗎？（AHNUMCL 將無法使用此 Java 啟動遊戲，但不會刪除硬碟上的檔案）"
     }
   },
   "LanguageMenu": {
@@ -1753,7 +1753,7 @@
   "LastExitedAbnormallyDialog": {
     "dialog": {
       "title": "上次執行異常退出",
-      "content": "SJMCL 上次執行時異常退出。您可以將日誌發送到<community>使用者社群</community>，或在 <github>GitHub</github> 發起 Issue 以尋求協助",
+      "content": "AHNUMCL 上次執行時異常退出。您可以將日誌發送到<community>使用者社群</community>，或在 <github>GitHub</github> 發起 Issue 以尋求協助",
       "viewLog": "檢視日誌"
     }
   },
@@ -1800,7 +1800,7 @@
   "MainLayout": {
     "fileDnD": {
       "title": "匯入模組包",
-      "desc": "將模組包檔案 {{fileName}} 匯入到 SJMCL"
+      "desc": "將模組包檔案 {{fileName}} 匯入到 AHNUMCL"
     }
   },
   "ManageSkinModal": {
@@ -2255,8 +2255,8 @@
   },
   "RestartForUpdateConfirmDialog": {
     "title": "啟動器更新",
-    "body": "新版本已完成下載，重新開啟 SJMCL 以完成更新",
-    "bodyWinInstaller": "新版本已完成下載，點選安裝將關閉 SJMCL 並執行安裝程式",
+    "body": "新版本已完成下載，重新開啟 AHNUMCL 以完成更新",
+    "bodyWinInstaller": "新版本已完成下載，點選安裝將關閉 AHNUMCL 並執行安裝程式",
     "button": {
       "restart": "重新啟動",
       "install": "安裝",
@@ -3174,7 +3174,7 @@
     "header": {
       "title": "在 GitHub 為我們點亮星標"
     },
-    "body": "如果您喜愛 SJMCL，並希望支援我們，可以在 GitHub 為我們點一顆星嗎？這個小小的動作對我們來說意義重大，能激勵我們為您持續提供特性體驗。",
+    "body": "如果您喜愛 AHNUMCL，並希望支援我們，可以在 GitHub 為我們點一顆星嗎？這個小小的動作對我們來說意義重大，能激勵我們為您持續提供特性體驗。",
     "button": {
       "later": "稍後",
       "starUs": "點亮星標"
@@ -3208,7 +3208,7 @@
   "UnavailableExePathAlertDialog": {
     "dialog": {
       "title": "無效的執行路徑",
-      "content": "您正在暫存或非法目錄下執行 SJMCL，您的設定和遊戲資料可能遺失。請將 SJMCL 移動到其他位置後再次執行。",
+      "content": "您正在暫存或非法目錄下執行 AHNUMCL，您的設定和遊戲資料可能遺失。請將 AHNUMCL 移動到其他位置後再次執行。",
       "btnContinue": "仍要執行"
     }
   },

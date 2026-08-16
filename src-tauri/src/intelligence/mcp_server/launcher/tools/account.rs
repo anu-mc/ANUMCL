@@ -150,7 +150,7 @@ pub fn tool_routes() -> Vec<ToolRoute<McpContext>> {
     ),
     mcp_tool!(
       "import_other_launcher_account_info",
-      "Retrieve account information from another launcher and import it directly into SJMCL. Supported launcher_type values: `HMCL`, `MultiMC`.",
+      "Retrieve account information from another launcher and import it directly into AHNUMCL. Supported launcher_type values: `HMCL`, `MultiMC`.",
       |app, params|
       #[serde(deny_unknown_fields)]
       {

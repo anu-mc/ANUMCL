@@ -1,7 +1,7 @@
 [package]
 name = "AHNUMCL"
 version.workspace = true
-description = "A Minecraft launcher based on SJMCL"
+description = "AHNUMCL, a Minecraft launcher based on SJMCL"
 authors = ["AHNUMC"]
 license = "GNU General Public License v3.0 (with additional terms)"
 repository = "https://github.com/ahnumc/AHNUMCL"

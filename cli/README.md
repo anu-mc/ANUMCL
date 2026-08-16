@@ -1,6 +1,6 @@
-# SJMCL CLI
+# AHNUMCL CLI
 
-A CLI for SJMCL that connects to the GUI app through its MCP server.
+A CLI for AHNUMCL that connects to the GUI app through its MCP server.
 
 Build: 
 

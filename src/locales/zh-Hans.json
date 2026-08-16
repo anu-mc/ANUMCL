@@ -195,7 +195,7 @@
         "title": "高级选项",
         "uuid": {
           "label": "UUID",
-          "placeholder": "（由 SJMCL 自动生成）",
+          "placeholder": "（由 AHNUMCL 自动生成）",
           "errorMessage": "UUID 格式不正确"
         }
       }
@@ -224,7 +224,7 @@
       "description": {
         "start": {
           "3rdparty": "此认证源支持 Yggdrasil Connect 规范提案",
-          "microsoft": "SJMCL 支持微软 OAuth 2.0 设备权限授予流"
+          "microsoft": "AHNUMCL 支持微软 OAuth 2.0 设备权限授予流"
         },
         "next": "请点击继续登录按钮跳转登录页面，输入以上代码（已自动复制）"
       },
@@ -548,7 +548,7 @@
       "type": "类型"
     },
     "warning": {
-      "mojang": "由 Mojang 分发的 Java 运行时将由 SJMCL 安装到特定目录",
+      "mojang": "由 Mojang 分发的 Java 运行时将由 AHNUMCL 安装到特定目录",
       "oracle": "从 Oracle 源下载可能需要登录"
     }
   },
@@ -867,10 +867,10 @@
     "title": "{{name}} 设置"
   },
   "ExtensionSettingsPage": {
-    "alert": "SJMCL 无法控制第三方扩展的行为，包括它们如何管理你的个人数据。请仅安装并启用来自可信来源的扩展。",
+    "alert": "AHNUMCL 无法控制第三方扩展的行为，包括它们如何管理你的个人数据。请仅安装并启用来自可信来源的扩展。",
     "fileDnD": {
-      "title": "安装 SJMCL 扩展",
-      "desc": "将扩展文件 {{fileName}} 安装到 SJMCL"
+      "title": "安装 AHNUMCL 扩展",
+      "desc": "将扩展文件 {{fileName}} 安装到 AHNUMCL"
     },
     "installed": "已安装扩展",
     "menu": {
@@ -1298,14 +1298,14 @@
         "directories": {
           "special": {
             "CURRENT_DIR": "当前文件夹",
-            "APP_DATA_SUBDIR": "SJMCL 数据文件夹",
+            "APP_DATA_SUBDIR": "AHNUMCL 数据文件夹",
             "OFFICIAL_DIR": "官方启动器文件夹"
           }
         }
       },
       "deleteDialog": {
         "title": "删除游戏目录",
-        "content": "确定要删除游戏目录 {{dirName}} 吗？（SJMCL 将不会扫描此目录，但不会删除硬盘上的文件）"
+        "content": "确定要删除游戏目录 {{dirName}} 吗？（AHNUMCL 将不会扫描此目录，但不会删除硬盘上的文件）"
       },
       "directoryNotExist": "该目录不存在，请删除并重新添加"
     },
@@ -1463,7 +1463,7 @@
     "top": {
       "settings": {
         "LauncherDocs": {
-          "title": "SJMC Launcher 文档",
+          "title": "AHNUMCL 文档",
           "url": "https://mc.sjtu.cn/sjmcl/docs"
         },
         "UserGroup": {
@@ -1694,7 +1694,7 @@
     }
   },
   "IntelligenceSettingsPage": {
-    "title": "SJMCL 智能",
+    "title": "AHNUMCL 智能",
     "description": "将人工智能模型整合进您的启动器使用与 Minecraft 游玩体验",
     "mcpServer": {
       "title": "MCP 服务",
@@ -1736,7 +1736,7 @@
     },
     "confirmDelete": {
       "title": "移除 Java",
-      "description": "确认要移除此版本 Java 吗？（SJMCL 将无法使用此 Java 启动游戏，但不会删除硬盘上的文件）"
+      "description": "确认要移除此版本 Java 吗？（AHNUMCL 将无法使用此 Java 启动游戏，但不会删除硬盘上的文件）"
     }
   },
   "LanguageMenu": {
@@ -1753,7 +1753,7 @@
   "LastExitedAbnormallyDialog": {
     "dialog": {
       "title": "上次运行异常退出",
-      "content": "SJMCL 上次运行时异常退出。您可以将日志发送到<community>用户社群</community>，或在 <github>GitHub</github> 发起 Issue 以寻求帮助",
+      "content": "AHNUMCL 上次运行时异常退出。您可以将日志发送到<community>用户社群</community>，或在 <github>GitHub</github> 发起 Issue 以寻求帮助",
       "viewLog": "查看日志"
     }
   },
@@ -1800,7 +1800,7 @@
   "MainLayout": {
     "fileDnD": {
       "title": "导入整合包",
-      "desc": "将整合包文件 {{fileName}} 导入到 SJMCL"
+      "desc": "将整合包文件 {{fileName}} 导入到 AHNUMCL"
     }
   },
   "ManageSkinModal": {
@@ -2255,8 +2255,8 @@
   },
   "RestartForUpdateConfirmDialog": {
     "title": "启动器更新",
-    "body": "新版本已完成下载，重新启动 SJMCL 以完成更新",
-    "bodyWinInstaller": "新版本已完成下载，点击安装将关闭 SJMCL 并运行安装程序",
+    "body": "新版本已完成下载，重新启动 AHNUMCL 以完成更新",
+    "bodyWinInstaller": "新版本已完成下载，点击安装将关闭 AHNUMCL 并运行安装程序",
     "button": {
       "restart": "重新启动",
       "install": "安装",
@@ -3174,7 +3174,7 @@
     "header": {
       "title": "在 GitHub 为我们点亮星标"
     },
-    "body": "如果您喜爱 SJMCL，并希望支持我们，可以在 GitHub 为我们点一颗星吗？这个小小的动作对我们来说意义重大，能激励我们为您持续提供特性体验。",
+    "body": "如果您喜爱 AHNUMCL，并希望支持我们，可以在 GitHub 为我们点一颗星吗？这个小小的动作对我们来说意义重大，能激励我们为您持续提供特性体验。",
     "button": {
       "later": "稍后",
       "starUs": "点亮星标"
@@ -3208,7 +3208,7 @@
   "UnavailableExePathAlertDialog": {
     "dialog": {
       "title": "无效的运行路径",
-      "content": "您正在临时或非法目录下运行 SJMCL，您的设置和游戏数据可能丢失。请将 SJMCL 移动到其他位置后再次运行。",
+      "content": "您正在临时或非法目录下运行 AHNUMCL，您的设置和游戏数据可能丢失。请将 AHNUMCL 移动到其他位置后再次运行。",
       "btnContinue": "仍要运行"
     }
   },

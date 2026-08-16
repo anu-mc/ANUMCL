@@ -1,7 +1,7 @@
 {
   "AboutSettingsPage": {
     "about": {
-      "title": "SJMCLについて",
+      "title": "AHNUMCLについて",
       "settings": {
         "version": {
           "title": "バージョン",
@@ -224,7 +224,7 @@
       "description": {
         "start": {
           "3rdparty": "この認証ソースは Yggdrasil Connect 仕様提案をサポート",
-          "microsoft": " SJMCL は Microsoft OAuth 2.0 デバイス認証フローをサポート"
+          "microsoft": " AHNUMCL は Microsoft OAuth 2.0 デバイス認証フローをサポート"
         },
         "next": "次へ進むボタンをクリックし、ログインウィンドウに上記のコードを入力してください。（自動コピー済）"
       },
@@ -548,7 +548,7 @@
       "type": "タイプ"
     },
     "warning": {
-      "mojang": "Mojang によって配布される Java ランタイムは SJMCL によって特定のディレクトリにインストールされます",
+      "mojang": "Mojang によって配布される Java ランタイムは AHNUMCL によって特定のディレクトリにインストールされます",
       "oracle": "Oracle ソースからのダウンロードにはログインの必要な場合があります"
     }
   },
@@ -867,10 +867,10 @@
     "title": "{{name}} の設定"
   },
   "ExtensionSettingsPage": {
-    "alert": "SJMCL はサードパーティー拡張機能の挙動や個人データの扱いを制御できません。信頼できる提供元の拡張機能のみをインストールして有効化してください。",
+    "alert": "AHNUMCL はサードパーティー拡張機能の挙動や個人データの扱いを制御できません。信頼できる提供元の拡張機能のみをインストールして有効化してください。",
     "fileDnD": {
-      "title": "SJMCL 拡張機能をインストール",
-      "desc": "拡張機能ファイル {{fileName}} を SJMCL にインストール"
+      "title": "AHNUMCL 拡張機能をインストール",
+      "desc": "拡張機能ファイル {{fileName}} を AHNUMCL にインストール"
     },
     "installed": "インストール済みの拡張機能",
     "menu": {
@@ -1215,7 +1215,7 @@
       "settings": {
         "language": {
           "title": "言語（Language）",
-          "communityAck": "SJMCL のローカリゼーションはコミュニティによる提供されました。@LAR73 さんのご協力を感謝いたします"
+          "communityAck": "AHNUMCL のローカリゼーションはコミュニティによる提供されました。@LAR73 さんのご協力を感謝いたします"
         },
         "resourceTranslation": {
           "title": "リソース翻訳",
@@ -1298,7 +1298,7 @@
         "directories": {
           "special": {
             "CURRENT_DIR": "現在フォルダー",
-            "APP_DATA_SUBDIR": "SJMCL データフォルダー",
+            "APP_DATA_SUBDIR": "AHNUMCL データフォルダー",
             "OFFICIAL_DIR": "公式ランチャーフォルダー"
           }
         }
@@ -1463,7 +1463,7 @@
     "top": {
       "settings": {
         "LauncherDocs": {
-          "title": "SJMC Launcher ドキュメント（中国語）",
+          "title": "AHNUMCL ドキュメント",
           "url": "https://mc.sjtu.cn/sjmcl/docs"
         },
         "UserGroup": {
@@ -1694,7 +1694,7 @@
     }
   },
   "IntelligenceSettingsPage": {
-    "title": "SJMCL AI",
+    "title": "AHNUMCL AI",
     "description": "AI モデルをランチャーと Minecraft の体験に統合します。",
     "mcpServer": {
       "title": "MCP サービス",
@@ -1753,7 +1753,7 @@
   "LastExitedAbnormallyDialog": {
     "dialog": {
       "title": "前回の実行は異常終了しました",
-      "content": "SJMCL は前回の実行時に異常終了しました。ログを<community>コミュニティ</community>に送るか、<github>GitHub</github> で Issue を作成してサポートを求めてください。",
+      "content": "AHNUMCL は前回の実行時に異常終了しました。ログを<community>コミュニティ</community>に送るか、<github>GitHub</github> で Issue を作成してサポートを求めてください。",
       "viewLog": "ログを表示"
     }
   },
@@ -1800,7 +1800,7 @@
   "MainLayout": {
     "fileDnD": {
       "title": "モッドパックをインポート",
-      "desc": "モッドパックファイル {{fileName}} を SJMCL にインポート"
+      "desc": "モッドパックファイル {{fileName}} を AHNUMCL にインポート"
     }
   },
   "ManageSkinModal": {
@@ -2255,8 +2255,8 @@
   },
   "RestartForUpdateConfirmDialog": {
     "title": "ランチャー更新",
-    "body": "新しいバージョンのダウンロードが完了しました。SJMCL を再起動して更新を完了してください",
-    "bodyWinInstaller": "新しいバージョンのダウンロードが完了しました。インストールをクリックすると SJMCL が閉じ、インストーラーが実行されます",
+    "body": "新しいバージョンのダウンロードが完了しました。AHNUMCL を再起動して更新を完了してください",
+    "bodyWinInstaller": "新しいバージョンのダウンロードが完了しました。インストールをクリックすると AHNUMCL が閉じ、インストーラーが実行されます",
     "button": {
       "restart": "再起動",
       "install": "インストール",
@@ -3172,9 +3172,9 @@
   },
   "StarUsModal": {
     "header": {
-      "title": "GitHub で SJMCL をスター"
+      "title": "GitHub で AHNUMCL をスター"
     },
-    "body": "SJMCL にご支援をお考えの場合は、GitHub リポジトリへのスターの付与をご検討ください。コミュニティーからの評価は開発チームの重要な指標となりまして、品質向上の原動力となっております。",
+    "body": "AHNUMCL にご支援をお考えの場合は、GitHub リポジトリへのスターの付与をご検討ください。コミュニティーからの評価は開発チームの重要な指標となりまして、品質向上の原動力となっております。",
     "button": {
       "later": "あとで",
       "starUs": "スターを付与"
@@ -3208,7 +3208,7 @@
   "UnavailableExePathAlertDialog": {
     "dialog": {
       "title": "安全でない実行パス",
-      "content": "SJMCL は一時ディレクトリまたは無効なディレクトリから実行されています。設定やゲームデータが失われる可能性があります。SJMCL を別の場所へ移動して再実行してください。",
+      "content": "AHNUMCL は一時ディレクトリまたは無効なディレクトリから実行されています。設定やゲームデータが失われる可能性があります。AHNUMCL を別の場所へ移動して再実行してください。",
       "btnContinue": "このまま実行"
     }
   },
