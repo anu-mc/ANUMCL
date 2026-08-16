@@ -2,6 +2,18 @@
 
 AHNUMCL follows [Semantic Versioning 2.0.0](https://semver.org/).
 
+## 1.0.3
+
+`2026-08-16`
+
+- 🌟 Add custom launcher primary colors with preset palettes and custom color input.
+- 🌟 Add interface and log font selection, searchable custom fonts, and adjustable font size.
+- 🌟 Add separate light and dark interface background palettes with custom colors and opacity controls.
+- 🌟 Add window opacity settings and smooth slider dragging without continuous configuration writes.
+- 🌟 Add the AHNU Flowy light and dark wallpaper set and make it the default background.
+- 🐛 Hide inactive Windows titlebar controls to prevent overlapping controls from showing through transparent windows.
+- 🐛 Replace remaining SJMCL labels and default data directory names with AHNUMCL branding.
+
 ## 1.0.2
 
 `2026-08-16`
