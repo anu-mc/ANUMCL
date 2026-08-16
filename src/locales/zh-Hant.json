@@ -288,7 +288,8 @@
       "title": "主題",
       "settings": {
         "primaryColor": {
-          "title": "啟動器強調色"
+          "title": "啟動器強調色",
+          "custom": "自訂顏色"
         },
         "colorMode": {
           "title": "顏色模式",

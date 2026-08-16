@@ -417,6 +417,11 @@ const AppearanceSettingsPage = () => {
               onColorSelect={(color) => {
                 update("appearance.theme.primaryColor", color);
               }}
+              customColor={appearanceConfigs.theme.customPrimaryColor}
+              onCustomColorChange={(color) => {
+                update("appearance.theme.customPrimaryColor", color);
+                update("appearance.theme.primaryColor", "custom");
+              }}
             />
           ),
         },

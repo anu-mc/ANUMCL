@@ -288,7 +288,8 @@
       "title": "主題",
       "settings": {
         "primaryColor": {
-          "title": "啟者強調色"
+          "title": "啟者強調色",
+          "custom": "自訂色"
         },
         "colorMode": {
           "title": "色式",

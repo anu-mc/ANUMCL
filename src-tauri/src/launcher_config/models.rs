@@ -262,6 +262,8 @@ structstruck::strike! {
       pub theme: struct {
         #[default = "blue"]
         pub primary_color: String,
+        #[default = "#3182ce"]
+        pub custom_primary_color: String,
         #[default = "light"]
         pub color_mode: String,
         pub use_liquid_glass_design: bool,

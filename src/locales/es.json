@@ -288,7 +288,8 @@
       "title": "Tema",
       "settings": {
         "primaryColor": {
-          "title": "Color Principal del Lanzador"
+          "title": "Color Principal del Lanzador",
+          "custom": "Color personalizado"
         },
         "colorMode": {
           "title": "Modo de Color",

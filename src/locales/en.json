@@ -288,7 +288,8 @@
       "title": "Theme",
       "settings": {
         "primaryColor": {
-          "title": "Launcher Primary Color"
+          "title": "Launcher Primary Color",
+          "custom": "Custom color"
         },
         "colorMode": {
           "title": "Color Mode",

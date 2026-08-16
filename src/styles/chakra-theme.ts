@@ -53,6 +53,20 @@ const customGraySolidButtonTheme = {
 const chakraExtendTheme = extendTheme({
   initialColorMode: "dark",
   useSystemColorMode: false,
+  colors: {
+    custom: {
+      50: "var(--ahnumcl-primary-50)",
+      100: "var(--ahnumcl-primary-100)",
+      200: "var(--ahnumcl-primary-200)",
+      300: "var(--ahnumcl-primary-300)",
+      400: "var(--ahnumcl-primary-400)",
+      500: "var(--ahnumcl-primary-500)",
+      600: "var(--ahnumcl-primary-600)",
+      700: "var(--ahnumcl-primary-700)",
+      800: "var(--ahnumcl-primary-800)",
+      900: "var(--ahnumcl-primary-900)",
+    },
+  },
   components: {
     Alert: {
       baseStyle: {

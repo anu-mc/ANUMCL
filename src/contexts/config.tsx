@@ -19,6 +19,7 @@ import {
 import { JavaInfo } from "@/models/misc";
 import { ConfigService } from "@/services/config";
 import { updateByKeyPath } from "@/utils/partial";
+import { applyCustomPrimaryColor } from "@/utils/theme";
 
 interface LauncherConfigContextType {
   config: LauncherConfig;
@@ -121,6 +122,10 @@ export const LauncherConfigContextProvider: React.FC<{
     document.documentElement.lang =
       localeResources[language]?.htmlLang || language;
   }, [language]);
+
+  useEffect(() => {
+    applyCustomPrimaryColor(config.appearance.theme.customPrimaryColor);
+  }, [config.appearance.theme.customPrimaryColor]);
 
   useEffect(() => {
     const media = window.matchMedia("(prefers-color-scheme: dark)");

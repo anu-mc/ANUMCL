@@ -288,7 +288,8 @@
       "title": "主题",
       "settings": {
         "primaryColor": {
-          "title": "启动器强调色"
+          "title": "启动器强调色",
+          "custom": "自定义颜色"
         },
         "colorMode": {
           "title": "颜色模式",

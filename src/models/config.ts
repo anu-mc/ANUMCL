@@ -96,6 +96,7 @@ export interface LauncherConfig {
   appearance: {
     theme: {
       primaryColor: string;
+      customPrimaryColor: string;
       colorMode: "light" | "dark" | "system";
       useLiquidGlassDesign: boolean;
       headNavStyle: "standard" | "simplified" | "adaptive";
@@ -292,6 +293,7 @@ export const defaultConfig: LauncherConfig = {
   appearance: {
     theme: {
       primaryColor: "blue",
+      customPrimaryColor: "#3182ce",
       colorMode: "light",
       useLiquidGlassDesign: false,
       headNavStyle: "adaptive",

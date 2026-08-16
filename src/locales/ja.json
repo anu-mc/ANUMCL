@@ -288,7 +288,8 @@
       "title": "テーマ",
       "settings": {
         "primaryColor": {
-          "title": "ランチャーのアクセントカラー"
+          "title": "ランチャーのアクセントカラー",
+          "custom": "カスタムカラー"
         },
         "colorMode": {
           "title": "カラーモード",

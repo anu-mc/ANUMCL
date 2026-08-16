@@ -4,6 +4,7 @@ import {
   Flex,
   HStack,
   IconButton,
+  Input,
   Popover,
   PopoverBody,
   PopoverContent,
@@ -19,7 +20,7 @@ import { ChakraColorEnums, ColorSelectorType } from "@/enums/misc";
 
 interface ChakraColorSelectorProps extends BoxProps {
   current: string;
-  onColorSelect: (color: ColorSelectorType) => void;
+  onColorSelect: (color: string) => void;
   size?: string;
 }
 
@@ -62,10 +63,12 @@ const ChakraColorSelector: React.FC<ChakraColorSelectorProps> = ({
 
 interface ChakraColorSelectPopoverProps {
   current?: string;
-  onColorSelect: (color: ColorSelectorType) => void;
+  onColorSelect: (color: string) => void;
   size?: string;
   withUnselectButton?: boolean;
   onUnselect?: () => void;
+  customColor?: string;
+  onCustomColorChange?: (color: string) => void;
 }
 
 export const ChakraColorSelectPopover: React.FC<
@@ -76,7 +79,10 @@ export const ChakraColorSelectPopover: React.FC<
   size = "xs",
   withUnselectButton = false,
   onUnselect,
+  customColor,
+  onCustomColorChange,
 }) => {
+  const { t } = useTranslation();
   const hasSelectedColor = current !== "";
 
   return (
@@ -99,6 +105,28 @@ export const ChakraColorSelectPopover: React.FC<
               size={size}
               flex={1}
             />
+            {onCustomColorChange && (
+              <Tooltip
+                label={t(
+                  "AppearanceSettingsPage.theme.settings.primaryColor.custom"
+                )}
+              >
+                <Input
+                  type="color"
+                  value={customColor || "#3182ce"}
+                  onChange={(event) => onCustomColorChange(event.target.value)}
+                  w={size === "xs" ? 6 : 8}
+                  h={size === "xs" ? 6 : 8}
+                  minW={size === "xs" ? 6 : 8}
+                  p={0}
+                  border={0}
+                  cursor="pointer"
+                  aria-label={t(
+                    "AppearanceSettingsPage.theme.settings.primaryColor.custom"
+                  )}
+                />
+              </Tooltip>
+            )}
             {withUnselectButton && hasSelectedColor && (
               <IconButton
                 size={size}
