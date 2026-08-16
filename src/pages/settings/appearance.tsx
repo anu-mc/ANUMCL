@@ -144,7 +144,7 @@ const AppearanceSettingsPage = () => {
 
           let newSelectedBgKey;
           if (customBgList.length === 1) {
-            newSelectedBgKey = `${builtInBgPrefix}Florwyn`;
+            newSelectedBgKey = `${builtInBgPrefix}zheshan-gate`;
             if (appearanceConfigs.background.randomCustom)
               update("appearance.background.randomCustom", false);
           } else {
@@ -319,24 +319,27 @@ const AppearanceSettingsPage = () => {
   };
 
   const PresetBackgroundList = () => {
-    const presetBgList = ["Florwyn", "SJTU-eastgate"];
+    const presetBgList = [
+      { key: "the-tower", thumbnail: "the-tower-thumbnail.png" },
+      { key: "zheshan-gate", thumbnail: "zheshan-gate-thumbnail.png" },
+    ];
 
     return (
       <Wrap spacing={3.5} justify="right">
         {presetBgList.map((bg) => (
-          <WrapItem key={bg}>
+          <WrapItem key={bg.key}>
             <BackgroundCard
-              bgAlt={bg}
-              bgSrc={`/images/backgrounds/${bg}-thumbnail.jpg`}
-              selected={selectedBgKey === bg}
+              bgAlt={bg.key}
+              bgSrc={`/images/backgrounds/${bg.thumbnail}`}
+              selected={selectedBgKey === bg.key}
               onSelect={() =>
                 update(
                   "appearance.background.choice",
-                  `${builtInBgPrefix}${bg}`
+                  `${builtInBgPrefix}${bg.key}`
                 )
               }
               label={t(
-                `AppearanceSettingsPage.background.presetBgList.${bg}.name`
+                `AppearanceSettingsPage.background.presetBgList.${bg.key}.name`
               )}
             />
           </WrapItem>

@@ -347,11 +347,11 @@
         }
       },
       "presetBgList": {
-        "Florwyn": {
-          "name": "櫻滿集"
+        "the-tower": {
+          "name": "鐘塔"
         },
-        "SJTU-eastgate": {
-          "name": "SJTU 紫氣東來門"
+        "zheshan-gate": {
+          "name": "赭山大門"
         }
       }
     },
