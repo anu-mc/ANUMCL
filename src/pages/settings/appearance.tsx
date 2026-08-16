@@ -7,6 +7,7 @@ import {
   Image,
   Slider,
   SliderFilledTrack,
+  SliderProps,
   SliderThumb,
   SliderTrack,
   Switch,
@@ -35,6 +36,38 @@ import { useToast } from "@/contexts/toast";
 import { ConfigService } from "@/services/config";
 import { UtilsService } from "@/services/utils";
 import { removeFileExt } from "@/utils/string";
+
+interface BufferedSliderProps extends Omit<
+  SliderProps,
+  "value" | "onChange" | "onChangeEnd"
+> {
+  value: number;
+  onValueCommit: (value: number) => void;
+}
+
+const BufferedSlider: React.FC<BufferedSliderProps> = ({
+  value,
+  onValueCommit,
+  children,
+  ...props
+}) => {
+  const [localValue, setLocalValue] = useState(value);
+
+  useEffect(() => {
+    setLocalValue(value);
+  }, [value]);
+
+  return (
+    <Slider
+      {...props}
+      value={localValue}
+      onChange={setLocalValue}
+      onChangeEnd={onValueCommit}
+    >
+      {children}
+    </Slider>
+  );
+};
 
 const AppearanceSettingsPage = () => {
   const { t } = useTranslation();
@@ -204,7 +237,7 @@ const AppearanceSettingsPage = () => {
 
           let newSelectedBgKey;
           if (customBgList.length === 1) {
-            newSelectedBgKey = `${builtInBgPrefix}zheshan-gate`;
+            newSelectedBgKey = `${builtInBgPrefix}ahnu-flowy`;
             if (appearanceConfigs.background.randomCustom)
               update("appearance.background.randomCustom", false);
           } else {
@@ -310,14 +343,14 @@ const AppearanceSettingsPage = () => {
           {/* 85% */}
           {t("AppearanceSettingsPage.font.settings.fontSize.small")}
         </Text>
-        <Slider
+        <BufferedSlider
           value={appearanceConfigs.font.fontSize}
           min={85}
           max={115}
           step={5}
           w={32}
           colorScheme={primaryColor}
-          onChange={(value) => {
+          onValueCommit={(value) => {
             update("appearance.font.fontSize", value);
           }}
         >
@@ -325,7 +358,7 @@ const AppearanceSettingsPage = () => {
             <SliderFilledTrack />
           </SliderTrack>
           <SliderThumb />
-        </Slider>
+        </BufferedSlider>
         <Text fontSize="14.72px">
           {" "}
           {/* 115% */}
@@ -339,14 +372,14 @@ const AppearanceSettingsPage = () => {
     return (
       <HStack spacing={2}>
         <Text fontSize="xs">50%</Text>
-        <Slider
+        <BufferedSlider
           value={appearanceConfigs.background.windowOpacity}
           min={50}
           max={100}
           step={5}
           w={32}
           colorScheme={primaryColor}
-          onChange={(value) => {
+          onValueCommit={(value) => {
             update("appearance.background.windowOpacity", value);
           }}
         >
@@ -354,7 +387,7 @@ const AppearanceSettingsPage = () => {
             <SliderFilledTrack />
           </SliderTrack>
           <SliderThumb />
-        </Slider>
+        </BufferedSlider>
         <Text fontSize="xs">100%</Text>
       </HStack>
     );
@@ -422,6 +455,7 @@ const AppearanceSettingsPage = () => {
 
   const PresetBackgroundList = () => {
     const presetBgList = [
+      { key: "ahnu-flowy", thumbnail: "ahnu-flowy-thumbnail.webp" },
       { key: "the-tower", thumbnail: "the-tower-thumbnail.webp" },
       { key: "zheshan-gate", thumbnail: "zheshan-gate-thumbnail.webp" },
     ];
@@ -557,14 +591,14 @@ const AppearanceSettingsPage = () => {
                   update(interfaceBackgroundColor.colorPath, "custom");
                 }}
               />
-              <Slider
+              <BufferedSlider
                 value={interfaceBackgroundColor.opacity}
                 min={20}
                 max={100}
                 step={5}
                 w={24}
                 colorScheme={primaryColor}
-                onChange={(value) => {
+                onValueCommit={(value) => {
                   update(interfaceBackgroundColor.opacityPath, value);
                 }}
               >
@@ -572,7 +606,7 @@ const AppearanceSettingsPage = () => {
                   <SliderFilledTrack />
                 </SliderTrack>
                 <SliderThumb />
-              </Slider>
+              </BufferedSlider>
               <Text fontSize="xs" minW={8} textAlign="right">
                 {interfaceBackgroundColor.opacity}%
               </Text>

@@ -317,7 +317,7 @@ export const defaultConfig: LauncherConfig = {
       logFontFamily: "%built-in",
     },
     background: {
-      choice: "%built-in:zheshan-gate",
+      choice: "%built-in:ahnu-flowy",
       randomCustom: false,
       autoDarken: false,
       windowOpacity: 100,

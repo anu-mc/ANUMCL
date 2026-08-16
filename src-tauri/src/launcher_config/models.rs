@@ -292,7 +292,7 @@ structstruck::strike! {
       },
       #[serde(default)]
       pub background: struct AppearanceBackgroundConfig {
-        #[default = "%built-in:zheshan-gate"]
+        #[default = "%built-in:ahnu-flowy"]
         pub choice: String,
         pub random_custom: bool,
         pub auto_darken: bool,

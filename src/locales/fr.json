@@ -354,6 +354,9 @@
         }
       },
       "presetBgList": {
+        "ahnu-flowy": {
+          "name": "AHNU Flowy"
+        },
         "the-tower": {
           "name": "钟塔"
         },
