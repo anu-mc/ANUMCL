@@ -4,7 +4,9 @@ use tauri::{AppHandle, Manager};
 use tauri_plugin_http::reqwest;
 use url::Url;
 
-use crate::account::helpers::authlib_injector::constants::CLIENT_IDS;
+use crate::account::helpers::authlib_injector::constants::{
+  AHNUMC_AUTH_SERVER_URL, AHNUMC_OIDC_CONFIGURATION_URL, CLIENT_IDS,
+};
 use crate::account::models::{AccountError, AccountInfo, AuthServerInfo};
 use crate::utils::web::normalize_url;
 
@@ -19,10 +21,14 @@ pub async fn fetch_auth_server_info(
 
       let mut client_id = None;
 
-      let openid_configuration_url = json["meta"]["feature.openid_configuration_url"]
+      let mut openid_configuration_url = json["meta"]["feature.openid_configuration_url"]
         .as_str()
         .unwrap_or_default()
         .to_string();
+
+      if normalize_url(&auth_url) == normalize_url(AHNUMC_AUTH_SERVER_URL) {
+        openid_configuration_url = AHNUMC_OIDC_CONFIGURATION_URL.to_string();
+      }
 
       if !openid_configuration_url.is_empty() {
         let url = Url::parse(&auth_url).map_err(|_| AccountError::Invalid)?;

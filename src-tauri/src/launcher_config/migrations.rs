@@ -68,7 +68,7 @@ where
         _ => None,
       })
       .map(|(url, enabled)| {
-        if url.starts_with(LEGACY_SJMC_DISCOVER_ENDPOINT) {
+        if url == LEGACY_SJMC_DISCOVER_ENDPOINT {
           (AHNUMC_DISCOVER_ENDPOINT.to_string(), enabled)
         } else {
           (url, enabled)

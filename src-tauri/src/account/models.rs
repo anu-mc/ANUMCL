@@ -8,7 +8,7 @@ use uuid::Uuid;
 use crate::APP_DATA_DIR;
 use crate::account::constants::ACCOUNTS_FILE_NAME;
 use crate::account::helpers::authlib_injector::constants::{
-  AHNUMC_AUTH_SERVER_URL, AHNUMC_HOMEPAGE_URL, PRESET_AUTH_SERVERS,
+  AHNUMC_AUTH_SERVER_URL, AHNUMC_HOMEPAGE_URL, AHNUMC_OIDC_CONFIGURATION_URL, PRESET_AUTH_SERVERS,
 };
 use crate::account::helpers::skin::draw_avatar;
 use crate::utils::image::ImageWrapper;
@@ -221,6 +221,15 @@ pub struct DeviceAuthResponseInfo {
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct OidcAuthInfo {
+  pub authorization_url: String,
+  pub state: String,
+  pub code_verifier: String,
+  pub redirect_uri: String,
+}
+
+#[derive(Debug, PartialEq, Eq, Clone, Deserialize, Serialize)]
 pub struct OAuthTokens {
   pub access_token: String,
   pub refresh_token: String,
@@ -284,10 +293,14 @@ impl From<AuthServerInfo> for AuthServer {
         non_email_login: info.metadata["meta"]["feature.non_email_login"]
           .as_bool()
           .unwrap_or(false),
-        openid_configuration_url: info.metadata["meta"]["feature.openid_configuration_url"]
-          .as_str()
-          .unwrap_or_default()
-          .to_string(),
+        openid_configuration_url: if is_ahnumc_auth_server {
+          AHNUMC_OIDC_CONFIGURATION_URL.to_string()
+        } else {
+          info.metadata["meta"]["feature.openid_configuration_url"]
+            .as_str()
+            .unwrap_or_default()
+            .to_string()
+        },
       },
       client_id: info.client_id,
     }
