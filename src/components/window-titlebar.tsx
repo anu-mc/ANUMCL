@@ -66,6 +66,7 @@ const WindowTitlebar = () => {
 
   const [isMacFullscreen, setIsMacFullscreen] = useState(false);
   const [isLinuxMaximized, setIsLinuxMaximized] = useState(false);
+  const [isWindowFocused, setIsWindowFocused] = useState(true);
   const [isMainWindow, setIsMainWindow] = useState(true);
   const [windowTitle, setWindowTitle] = useState("");
 
@@ -170,7 +171,7 @@ const WindowTitlebar = () => {
   // Remove decorum fallback titlebar if it was created before React host mounted.
   useEffect(() => {
     if (typeof window === "undefined" || !isWindows) return;
-    const host = document.getElementById("sjmcl-window-decorum-host");
+    const host = document.getElementById("ahnumcl-window-decorum-host");
     if (!host) return;
 
     const allHosts = Array.from(
@@ -190,6 +191,23 @@ const WindowTitlebar = () => {
       }
       el.remove();
     });
+  }, [isWindows]);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !isWindows) return;
+    const currentWindow = getCurrentWindow();
+    let unlistenFocusChanged: (() => void) | undefined;
+
+    (async () => {
+      setIsWindowFocused(document.hasFocus());
+      unlistenFocusChanged = await currentWindow.onFocusChanged(
+        ({ payload: focused }) => setIsWindowFocused(focused)
+      );
+    })();
+
+    return () => {
+      unlistenFocusChanged?.();
+    };
   }, [isWindows]);
 
   // Listen macOS native fullscreen mode, make titlebar hidden.
@@ -259,6 +277,7 @@ const WindowTitlebar = () => {
           data-tauri-decorum-tb
           spacing={0}
           h="100%"
+          visibility={isWindowFocused ? "visible" : "hidden"}
         />
       )}
       {isLinux && (
