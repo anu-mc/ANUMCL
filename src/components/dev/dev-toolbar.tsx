@@ -23,6 +23,7 @@ import {
 import { useSharedModals } from "@/contexts/shared-modal";
 import { emitDeepLink } from "@/hooks/deep-link";
 import { isProd } from "@/utils/env";
+import { logger } from "@/utils/logging";
 
 const DevToolbarContent: React.FC = () => {
   const router = useRouter();
@@ -190,6 +191,7 @@ const DevToolbar: React.FC = () => {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const offset = useRef({ x: 0, y: 0 });
+  const dragStart = useRef({ x: 0, y: 0 });
   const didDrag = useRef(false);
 
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -271,11 +273,13 @@ const DevToolbar: React.FC = () => {
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault();
+      didDrag.current = false;
       setIsDragging(true);
       offset.current = {
         x: e.clientX - position.x,
         y: e.clientY - position.y,
       };
+      dragStart.current = { x: e.clientX, y: e.clientY };
     },
     [position]
   );
@@ -283,7 +287,14 @@ const DevToolbar: React.FC = () => {
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
       if (!isDragging || !containerRef.current) return;
-      didDrag.current = true;
+      if (
+        Math.hypot(
+          e.clientX - dragStart.current.x,
+          e.clientY - dragStart.current.y
+        ) >= 4
+      ) {
+        didDrag.current = true;
+      }
       const rect = containerRef.current.getBoundingClientRect();
       const newX = e.clientX - offset.current.x;
       const newY = e.clientY - offset.current.y;
@@ -300,9 +311,6 @@ const DevToolbar: React.FC = () => {
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
     updateAnchorCorner(position.x, position.y);
-    setTimeout(() => {
-      didDrag.current = false;
-    }, 0);
   }, [position, updateAnchorCorner]);
 
   const handleWindowResize = useCallback(() => {
@@ -383,9 +391,11 @@ const DevToolbar: React.FC = () => {
               variant="ghost"
               cursor={isDragging ? "grabbing" : "grab"}
               onClick={() => {
-                if (!didDrag.current) {
-                  setIsExpanded((prev) => !prev);
+                if (didDrag.current) {
+                  didDrag.current = false;
+                  return;
                 }
+                setIsExpanded((prev) => !prev);
               }}
               onMouseDown={handleMouseDown}
             />
