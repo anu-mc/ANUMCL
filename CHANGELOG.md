@@ -6,10 +6,12 @@ AHNUMCL follows [Semantic Versioning 2.0.0](https://semver.org/).
 
 `2026-08-16`
 
-- 🌟 Support AHNUMC Skin login through Yggdrasil Connect device authorization.
-- 🌟 Replace the built-in wallpapers and set Zheshan Gate as the default background.
-- 🌟 Restore the MUA community news source and improve retry handling for community news requests.
-- 🐛 Fix unreliable expand and collapse behavior of the development toolbar.
+- 🌟 feat: add AHNUMC OIDC login and refine news retries @FloranceYeh
+- 🐛 fix: complete AHNUMC OIDC backend and preserve MUA news source @FloranceYeh
+- 🌟 feat: replace default wallpapers @FloranceYeh
+- 🐛 fix(account): use Yggdrasil Connect for AHNUMC login @FloranceYeh
+- 🐛 fix(dev): make toolbar toggle reliably @FloranceYeh
+- 📦 chore(release): bump version to 1.0.2 @FloranceYeh
 
 ## 1.0.1
 
