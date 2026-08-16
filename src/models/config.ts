@@ -366,7 +366,10 @@ export const defaultConfig: LauncherConfig = {
   },
   localGameDirectories: [{ name: "Current", dir: ".minecraft/" }],
   globalGameConfig: defaultGameConfig,
-  discoverSourceEndpoints: [["https://api.ahnumc.org/v1/articles", true]],
+  discoverSourceEndpoints: [
+    ["https://api.ahnumc.org/v1/articles", true],
+    ["https://mc.sjtu.cn/api-sjmcl/article/mua", true],
+  ],
   extraJavaPaths: [],
   suppressedDialogs: [],
   states: {

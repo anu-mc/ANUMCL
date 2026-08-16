@@ -8,7 +8,8 @@ use tauri_plugin_http::reqwest;
 use crate::discover::helpers::mc_news::{MC_NEWS_ENDPOINT, fetch_mc_news_page};
 use crate::discover::models::{NewsPostRequest, NewsPostResponse, NewsSourceInfo};
 use crate::launcher_config::models::LauncherConfig;
-use crate::utils::web::with_retry;
+use crate::utils::web::with_retry_duration;
+use std::time::Duration;
 
 #[tauri::command]
 pub async fn fetch_news_sources_info(app: AppHandle) -> SJMCLResult<Vec<NewsSourceInfo>> {
@@ -18,7 +19,10 @@ pub async fn fetch_news_sources_info(app: AppHandle) -> SJMCLResult<Vec<NewsSour
     state.discover_source_endpoints.clone()
   };
 
-  let client = with_retry(app.state::<reqwest::Client>().inner().clone());
+  let client = with_retry_duration(
+    app.state::<reqwest::Client>().inner().clone(),
+    Duration::from_secs(30),
+  );
 
   let tasks: Vec<_> = post_sources
     .into_iter()
@@ -61,11 +65,20 @@ pub async fn fetch_news_post_summaries(
   app: AppHandle,
   requests: Vec<NewsPostRequest>,
 ) -> SJMCLResult<NewsPostResponse> {
-  let client = with_retry(app.state::<reqwest::Client>().inner().clone());
+  let community_client = with_retry_duration(
+    app.state::<reqwest::Client>().inner().clone(),
+    Duration::from_secs(30),
+  );
+  let official_client =
+    crate::utils::web::with_retry(app.state::<reqwest::Client>().inner().clone());
   let tasks: Vec<_> = requests
     .into_iter()
     .map(|NewsPostRequest { url, cursor }| {
-      let client = client.clone();
+      let client = if url.starts_with(MC_NEWS_ENDPOINT) {
+        official_client.clone()
+      } else {
+        community_client.clone()
+      };
       async move {
         if url.starts_with(MC_NEWS_ENDPOINT) {
           return fetch_mc_news_page(&client, &url, cursor).await;

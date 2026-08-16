@@ -9,6 +9,7 @@ import {
   AuthServer,
   DeviceAuthResponseInfo,
   MicrosoftFriendList,
+  OidcAuthInfo,
   Player,
 } from "@/models/account";
 import { InvokeResponse } from "@/models/response";
@@ -18,6 +19,28 @@ import { responseHandler } from "@/utils/response";
  * Service class for managing accounts, players, and authentication servers.
  */
 export class AccountService {
+  @responseHandler("account")
+  static async startAhnumcOidcLogin(
+    authServerUrl: string
+  ): Promise<InvokeResponse<OidcAuthInfo>> {
+    return await invoke("start_ahnumc_oidc_login", { authServerUrl });
+  }
+
+  @responseHandler("account")
+  static async completeAhnumcOidcLogin(
+    authServerUrl: string,
+    authInfo: OidcAuthInfo,
+    code: string,
+    callbackState: string
+  ): Promise<InvokeResponse<void>> {
+    return await invoke("complete_ahnumc_oidc_login", {
+      authServerUrl,
+      authInfo,
+      code,
+      callbackState,
+    });
+  }
+
   /**
    * RETRIEVE the list of players.
    * @returns {Promise<InvokeResponse<Player[]>>}
