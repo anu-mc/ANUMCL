@@ -64,15 +64,19 @@ const AppearanceSettingsPage = () => {
           color: appearanceConfigs.theme.interfaceBackgroundDarkColor,
           customColor:
             appearanceConfigs.theme.interfaceBackgroundDarkCustomColor,
+          opacity: appearanceConfigs.theme.interfaceBackgroundDarkOpacity,
           colorPath: "appearance.theme.interfaceBackgroundDarkColor",
           customColorPath:
             "appearance.theme.interfaceBackgroundDarkCustomColor",
+          opacityPath: "appearance.theme.interfaceBackgroundDarkOpacity",
         }
       : {
           color: appearanceConfigs.theme.interfaceBackgroundColor,
           customColor: appearanceConfigs.theme.interfaceBackgroundCustomColor,
+          opacity: appearanceConfigs.theme.interfaceBackgroundOpacity,
           colorPath: "appearance.theme.interfaceBackgroundColor",
           customColorPath: "appearance.theme.interfaceBackgroundCustomColor",
+          opacityPath: "appearance.theme.interfaceBackgroundOpacity",
         };
 
   const [customBgList, setCustomBgList] = useState<Record<string, string>[]>(
@@ -553,6 +557,25 @@ const AppearanceSettingsPage = () => {
                   update(interfaceBackgroundColor.colorPath, "custom");
                 }}
               />
+              <Slider
+                value={interfaceBackgroundColor.opacity}
+                min={20}
+                max={100}
+                step={5}
+                w={24}
+                colorScheme={primaryColor}
+                onChange={(value) => {
+                  update(interfaceBackgroundColor.opacityPath, value);
+                }}
+              >
+                <SliderTrack>
+                  <SliderFilledTrack />
+                </SliderTrack>
+                <SliderThumb />
+              </Slider>
+              <Text fontSize="xs" minW={8} textAlign="right">
+                {interfaceBackgroundColor.opacity}%
+              </Text>
             </HStack>
           ),
         },

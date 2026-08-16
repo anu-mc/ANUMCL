@@ -139,10 +139,15 @@ export const LauncherConfigContextProvider: React.FC<{
       colorMode === "dark"
         ? config.appearance.theme.interfaceBackgroundDarkCustomColor
         : config.appearance.theme.interfaceBackgroundCustomColor;
+    const interfaceBackgroundOpacity =
+      colorMode === "dark"
+        ? config.appearance.theme.interfaceBackgroundDarkOpacity
+        : config.appearance.theme.interfaceBackgroundOpacity;
 
     applyInterfaceBackgroundColor(
       interfaceBackgroundColor,
       interfaceBackgroundCustomColor,
+      interfaceBackgroundOpacity,
       colorMode
     );
   }, [
@@ -151,6 +156,8 @@ export const LauncherConfigContextProvider: React.FC<{
     config.appearance.theme.interfaceBackgroundCustomColor,
     config.appearance.theme.interfaceBackgroundDarkColor,
     config.appearance.theme.interfaceBackgroundDarkCustomColor,
+    config.appearance.theme.interfaceBackgroundDarkOpacity,
+    config.appearance.theme.interfaceBackgroundOpacity,
   ]);
 
   useEffect(() => {

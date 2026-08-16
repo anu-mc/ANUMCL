@@ -9,6 +9,7 @@ import {
   PopoverBody,
   PopoverContent,
   PopoverTrigger,
+  Portal,
   Spacer,
   Tooltip,
 } from "@chakra-ui/react";
@@ -97,51 +98,55 @@ export const ChakraColorSelectPopover: React.FC<
           icon={<LuChevronDown />}
         />
       </PopoverTrigger>
-      <PopoverContent>
-        <PopoverBody>
-          <HStack spacing={2}>
-            <ChakraColorSelector
-              current={current}
-              onColorSelect={onColorSelect}
-              size={size}
-              flex={1}
-            />
-            {onCustomColorChange && (
-              <Tooltip
-                label={t(
-                  "AppearanceSettingsPage.theme.settings.primaryColor.custom"
-                )}
-              >
-                <Input
-                  type="color"
-                  value={customColor || "#3182ce"}
-                  onChange={(event) => onCustomColorChange(event.target.value)}
-                  w={size === "xs" ? 6 : 8}
-                  h={size === "xs" ? 6 : 8}
-                  minW={size === "xs" ? 6 : 8}
-                  p={0}
-                  border={0}
-                  cursor="pointer"
-                  aria-label={t(
+      <Portal>
+        <PopoverContent>
+          <PopoverBody>
+            <HStack spacing={2}>
+              <ChakraColorSelector
+                current={current}
+                onColorSelect={onColorSelect}
+                size={size}
+                flex={1}
+              />
+              {onCustomColorChange && (
+                <Tooltip
+                  label={t(
                     "AppearanceSettingsPage.theme.settings.primaryColor.custom"
                   )}
+                >
+                  <Input
+                    type="color"
+                    value={customColor || "#3182ce"}
+                    onChange={(event) =>
+                      onCustomColorChange(event.target.value)
+                    }
+                    w={size === "xs" ? 6 : 8}
+                    h={size === "xs" ? 6 : 8}
+                    minW={size === "xs" ? 6 : 8}
+                    p={0}
+                    border={0}
+                    cursor="pointer"
+                    aria-label={t(
+                      "AppearanceSettingsPage.theme.settings.primaryColor.custom"
+                    )}
+                  />
+                </Tooltip>
+              )}
+              {withUnselectButton && hasSelectedColor && (
+                <IconButton
+                  size={size}
+                  colorScheme={current || "gray"}
+                  variant="outline"
+                  aria-label="unselect-color"
+                  icon={<LuX />}
+                  onClick={onUnselect}
+                  isDisabled={!onUnselect}
                 />
-              </Tooltip>
-            )}
-            {withUnselectButton && hasSelectedColor && (
-              <IconButton
-                size={size}
-                colorScheme={current || "gray"}
-                variant="outline"
-                aria-label="unselect-color"
-                icon={<LuX />}
-                onClick={onUnselect}
-                isDisabled={!onUnselect}
-              />
-            )}
-          </HStack>
-        </PopoverBody>
-      </PopoverContent>
+              )}
+            </HStack>
+          </PopoverBody>
+        </PopoverContent>
+      </Portal>
     </Popover>
   );
 };

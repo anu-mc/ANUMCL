@@ -268,10 +268,14 @@ structstruck::strike! {
         pub interface_background_color: String,
         #[default = "#fafafa"]
         pub interface_background_custom_color: String,
+        #[default = 100]
+        pub interface_background_opacity: usize,
         #[default = "custom"]
         pub interface_background_dark_color: String,
         #[default = "#1a202c"]
         pub interface_background_dark_custom_color: String,
+        #[default = 100]
+        pub interface_background_dark_opacity: usize,
         #[default = "light"]
         pub color_mode: String,
         pub use_liquid_glass_design: bool,

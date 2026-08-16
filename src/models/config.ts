@@ -99,8 +99,10 @@ export interface LauncherConfig {
       customPrimaryColor: string;
       interfaceBackgroundColor: string;
       interfaceBackgroundCustomColor: string;
+      interfaceBackgroundOpacity: number;
       interfaceBackgroundDarkColor: string;
       interfaceBackgroundDarkCustomColor: string;
+      interfaceBackgroundDarkOpacity: number;
       colorMode: "light" | "dark" | "system";
       useLiquidGlassDesign: boolean;
       headNavStyle: "standard" | "simplified" | "adaptive";
@@ -301,8 +303,10 @@ export const defaultConfig: LauncherConfig = {
       customPrimaryColor: "#3182ce",
       interfaceBackgroundColor: "custom",
       interfaceBackgroundCustomColor: "#fafafa",
+      interfaceBackgroundOpacity: 100,
       interfaceBackgroundDarkColor: "custom",
       interfaceBackgroundDarkCustomColor: "#1a202c",
+      interfaceBackgroundDarkOpacity: 100,
       colorMode: "light",
       useLiquidGlassDesign: false,
       headNavStyle: "adaptive",

@@ -90,6 +90,7 @@ body img {
 /* card-style content container */
 .content-full-y {
   height: 100%;
+  overflow-x: hidden;
   overflow-y: auto;
   padding: var(--chakra-space-3-5);
   user-select: none;

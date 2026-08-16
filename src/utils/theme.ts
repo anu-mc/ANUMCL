@@ -47,22 +47,26 @@ export const applyCustomPrimaryColor = (color: string) => {
 export const applyInterfaceBackgroundColor = (
   color: string,
   customColor: string,
+  opacity: number,
   colorMode: "light" | "dark"
 ) => {
+  const normalizedOpacity = Math.min(Math.max(opacity, 0), 100);
   const resolvedColor = color === "custom" ? customColor : "";
 
   if (/^#[0-9a-f]{6}$/i.test(resolvedColor)) {
     document.documentElement.style.setProperty(
       "--ahnumcl-interface-background",
-      resolvedColor
+      `color-mix(in srgb, ${resolvedColor} ${normalizedOpacity}%, transparent)`
     );
   } else if (isChakraColor(color)) {
     const shade = colorMode === "dark" ? 900 : 50;
     document.documentElement.style.setProperty(
       "--ahnumcl-interface-background",
-      colorMode === "dark"
-        ? `color-mix(in srgb, var(--chakra-colors-${color}-${shade}) 65%, black)`
-        : `var(--chakra-colors-${color}-${shade})`
+      `color-mix(in srgb, ${
+        colorMode === "dark"
+          ? `color-mix(in srgb, var(--chakra-colors-${color}-${shade}) 65%, black)`
+          : `var(--chakra-colors-${color}-${shade})`
+      } ${normalizedOpacity}%, transparent)`
     );
   } else {
     document.documentElement.style.removeProperty(
