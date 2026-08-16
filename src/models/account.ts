@@ -66,13 +66,6 @@ export interface DeviceAuthResponseInfo {
   expiresIn: number;
 }
 
-export interface OidcAuthInfo {
-  authorizationUrl: string;
-  state: string;
-  codeVerifier: string;
-  redirectUri: string;
-}
-
 export interface MicrosoftFriend {
   profileId: PlayerInfo["uuid"];
   name: PlayerInfo["name"];

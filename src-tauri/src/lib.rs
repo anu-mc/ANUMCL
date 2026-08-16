@@ -109,8 +109,6 @@ pub async fn run() {
         launcher_config::commands::install_launcher_update,
         account::commands::retrieve_player_list,
         account::commands::add_player_offline,
-        account::commands::start_ahnumc_oidc_login,
-        account::commands::complete_ahnumc_oidc_login,
         account::commands::fetch_oauth_code,
         account::commands::add_player_oauth,
         account::commands::relogin_player_oauth,

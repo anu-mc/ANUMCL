@@ -5,7 +5,7 @@ use tauri_plugin_http::reqwest;
 use url::Url;
 
 use crate::account::helpers::authlib_injector::constants::{
-  AHNUMC_AUTH_SERVER_URL, AHNUMC_OIDC_CONFIGURATION_URL, CLIENT_IDS,
+  AHNUMC_AUTH_SERVER_URL, AHNUMC_YGGDRASIL_CONNECT_CONFIGURATION_URL, CLIENT_IDS,
 };
 use crate::account::models::{AccountError, AccountInfo, AuthServerInfo};
 use crate::utils::web::normalize_url;
@@ -27,7 +27,7 @@ pub async fn fetch_auth_server_info(
         .to_string();
 
       if normalize_url(&auth_url) == normalize_url(AHNUMC_AUTH_SERVER_URL) {
-        openid_configuration_url = AHNUMC_OIDC_CONFIGURATION_URL.to_string();
+        openid_configuration_url = AHNUMC_YGGDRASIL_CONNECT_CONFIGURATION_URL.to_string();
       }
 
       if !openid_configuration_url.is_empty() {

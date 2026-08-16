@@ -50,13 +50,7 @@ import { useGlobalData } from "@/contexts/global-data";
 import { useSharedModals } from "@/contexts/shared-modal";
 import { useToast } from "@/contexts/toast";
 import { PlayerType } from "@/enums/account";
-import useDeepLink from "@/hooks/deep-link";
-import {
-  AuthServer,
-  DeviceAuthResponseInfo,
-  OidcAuthInfo,
-  Player,
-} from "@/models/account";
+import { AuthServer, DeviceAuthResponseInfo, Player } from "@/models/account";
 import {
   InvokeResponse,
   ResponseError,
@@ -92,7 +86,6 @@ const AddPlayerModal: React.FC<AddPlayerModalProps> = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [oauthCodeResponse, setOAuthCodeResponse] =
     useState<DeviceAuthResponseInfo>();
-  const [oidcAuthInfo, setOidcAuthInfo] = useState<OidcAuthInfo>();
   const [showAdvancedOptions, setShowAdvancedOptions] =
     useState<boolean>(false);
   const [candidatePlayers, setCandidatePlayers] = useState<Player[]>([]);
@@ -100,31 +93,6 @@ const AddPlayerModal: React.FC<AddPlayerModalProps> = ({
 
   const initialRef = useRef<HTMLInputElement>(null);
   const oauthRequestIdRef = useRef(0);
-
-  useDeepLink({
-    trigger: "oauth/callback*",
-    onCall: (_url, subpath) => {
-      if (!oidcAuthInfo || !authServer?.authUrl.includes("skin.ahnumc.org"))
-        return;
-      const query = new URL(`ahnumcl://${subpath}`).searchParams;
-      const code = query.get("code");
-      const callbackState = query.get("state");
-      if (!code || !callbackState) return;
-      setIsLoading(true);
-      setIsOAuthSubmitting(true);
-      AccountService.completeAhnumcOidcLogin(
-        authServer.authUrl,
-        oidcAuthInfo,
-        code,
-        callbackState
-      )
-        .then((response) => {
-          if (response.status === "success") afterLogin(response);
-          else afterFailure(response);
-        })
-        .finally(() => setIsOAuthSubmitting(false));
-    },
-  });
 
   const {
     isOpen: isSelectPlayerModalOpen,
@@ -156,7 +124,7 @@ const AddPlayerModal: React.FC<AddPlayerModalProps> = ({
     if (
       playerType === PlayerType.ThirdParty &&
       authServer?.features.openidConfigurationUrl &&
-      (authServer.clientId || authServer.authUrl.includes("skin.ahnumc.org"))
+      authServer.clientId
     ) {
       setShowOAuth(true); // if support, first show OAuth
     } else {
@@ -186,7 +154,6 @@ const AddPlayerModal: React.FC<AddPlayerModalProps> = ({
 
     oauthRequestIdRef.current += 1;
     setOAuthCodeResponse(undefined);
-    setOidcAuthInfo(undefined);
     setIsLoading(false);
     AccountService.cancelOAuth();
   }, [
@@ -213,22 +180,6 @@ const AddPlayerModal: React.FC<AddPlayerModalProps> = ({
 
   const handleFetchOAuthCode = () => {
     if (playerType === PlayerType.Offline) return;
-    if (authServer?.authUrl.includes("skin.ahnumc.org")) {
-      setIsOAuthSubmitting(true);
-      setIsLoading(true);
-      AccountService.startAhnumcOidcLogin(authServer.authUrl).then(
-        (response) => {
-          if (response.status === "success") {
-            setOidcAuthInfo(response.data);
-            openUrl(response.data.authorizationUrl);
-          } else {
-            afterFailure(response);
-            setIsOAuthSubmitting(false);
-          }
-        }
-      );
-      return;
-    }
     setIsOAuthSubmitting(false);
     const requestId = ++oauthRequestIdRef.current;
     setOAuthCodeResponse(undefined);

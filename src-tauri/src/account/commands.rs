@@ -17,8 +17,8 @@ use crate::account::helpers::import::multimc::retrieve_multimc_account_info;
 use crate::account::helpers::microsoft::models::{MicrosoftFriendAction, MicrosoftFriendList};
 use crate::account::helpers::{microsoft, misc, offline};
 use crate::account::models::{
-  AccountError, AccountInfo, AuthServer, DeviceAuthResponseInfo, OidcAuthInfo, Player, PlayerInfo,
-  PlayerType, PresetRole, SkinModel, TextureType,
+  AccountError, AccountInfo, AuthServer, DeviceAuthResponseInfo, Player, PlayerInfo, PlayerType,
+  PresetRole, SkinModel, TextureType,
 };
 use crate::launcher_config::models::LauncherConfig;
 use crate::utils::fs::get_app_resource_filepath;
@@ -59,50 +59,6 @@ pub fn retrieve_player_list(app: AppHandle) -> SJMCLResult<Vec<Player>> {
 #[tauri::command]
 pub async fn add_player_offline(app: AppHandle, username: String, uuid: String) -> SJMCLResult<()> {
   let new_player = offline::login(&app, username, uuid).await?;
-
-  misc::add_player(&app, new_player)
-}
-
-#[tauri::command]
-pub async fn start_ahnumc_oidc_login(
-  app: AppHandle,
-  auth_server_url: String,
-) -> SJMCLResult<OidcAuthInfo> {
-  let auth_server = AuthServer::from(get_auth_server_info_by_url(&app, auth_server_url)?);
-  let client_id = auth_server.client_id.ok_or(AccountError::Invalid)?;
-
-  authlib_injector::oauth::create_authorization_request(
-    &app,
-    auth_server.features.openid_configuration_url,
-    client_id,
-  )
-  .await
-}
-
-#[tauri::command]
-pub async fn complete_ahnumc_oidc_login(
-  app: AppHandle,
-  auth_server_url: String,
-  auth_info: OidcAuthInfo,
-  code: String,
-  callback_state: String,
-) -> SJMCLResult<()> {
-  if auth_info.state != callback_state {
-    return Err(AccountError::Invalid.into());
-  }
-
-  let auth_server = AuthServer::from(get_auth_server_info_by_url(&app, auth_server_url.clone())?);
-  let client_id = auth_server.client_id.ok_or(AccountError::Invalid)?;
-  let new_player = authlib_injector::oauth::exchange_authorization_code(
-    &app,
-    auth_server_url,
-    auth_server.features.openid_configuration_url,
-    client_id,
-    code,
-    auth_info.redirect_uri,
-    auth_info.code_verifier,
-  )
-  .await?;
 
   misc::add_player(&app, new_player)
 }

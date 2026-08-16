@@ -1,7 +1,7 @@
 pub static AUTHLIB_INJECTOR_JAR_NAME: &str = "authlib-injector.jar";
 pub const AHNUMC_AUTH_SERVER_URL: &str = "https://skin.ahnumc.org/api/yggdrasil";
 pub const AHNUMC_HOMEPAGE_URL: &str = "https://skin.ahnumc.org";
-pub const AHNUMC_OIDC_CONFIGURATION_URL: &str =
+pub const AHNUMC_YGGDRASIL_CONNECT_CONFIGURATION_URL: &str =
   "https://skin.ahnumc.org/.well-known/openid-configuration/oauth";
 pub static PRESET_AUTH_SERVERS: [&str; 3] = [
   AHNUMC_AUTH_SERVER_URL,
@@ -11,9 +11,8 @@ pub static PRESET_AUTH_SERVERS: [&str; 3] = [
 pub static SCOPE: &str =
   "openid offline_access Yggdrasil.PlayerProfiles.Select Yggdrasil.Server.Join";
 
-pub static CLIENT_IDS: [(&str, &str); 6] = [
+pub static CLIENT_IDS: [(&str, &str); 5] = [
   // built-in preset auth servers
-  ("skin.ahnumc.org", "40483db8-48db-470d-b08c-c4f6c9cfb7db"),
   ("skin.mualliance.ltd", "27"),
   ("littleskin.cn", "1014"),
   // supported MUA auth servers (ref: https://github.com/SJMC-Dev/SJMCL-client-ids)
