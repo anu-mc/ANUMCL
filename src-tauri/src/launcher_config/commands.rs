@@ -219,6 +219,52 @@ pub fn delete_custom_background(app: AppHandle, file_name: String) -> SJMCLResul
 }
 
 #[tauri::command]
+pub fn retrieve_custom_font_list(app: AppHandle) -> SJMCLResult<Vec<String>> {
+  let fonts_dir = app
+    .path()
+    .resolve::<PathBuf>("UserContent/Fonts".into(), BaseDirectory::AppData)?;
+  if !fonts_dir.exists() {
+    return Ok(Vec::new());
+  }
+
+  let valid_extensions = ["ttf", "otf", "woff", "woff2"];
+  Ok(
+    fs::read_dir(fonts_dir)?
+      .filter_map(|entry| entry.ok())
+      .filter_map(|entry| {
+        let file_name = entry.file_name().into_string().ok()?;
+        let extension = Path::new(&file_name).extension()?.to_str()?.to_lowercase();
+        valid_extensions
+          .contains(&extension.as_str())
+          .then_some(file_name)
+      })
+      .collect(),
+  )
+}
+
+#[tauri::command]
+pub fn add_custom_font(app: AppHandle, source_src: String) -> SJMCLResult<String> {
+  let source_path = Path::new(&source_src);
+  let valid_extensions = ["ttf", "otf", "woff", "woff2"];
+  let is_font = source_path
+    .extension()
+    .and_then(|extension| extension.to_str())
+    .map(|extension| valid_extensions.contains(&extension.to_lowercase().as_str()))
+    .unwrap_or(false);
+  if !source_path.is_file() || !is_font {
+    return Ok(String::new());
+  }
+
+  let fonts_dir = app
+    .path()
+    .resolve::<PathBuf>("UserContent/Fonts".into(), BaseDirectory::AppData)?;
+  fs::create_dir_all(&fonts_dir)?;
+  let dest_path = generate_unique_filename(&fonts_dir, source_path.file_name().unwrap());
+  fs::copy(source_path, &dest_path)?;
+  Ok(dest_path.file_name().unwrap().to_string_lossy().to_string())
+}
+
+#[tauri::command]
 pub async fn retrieve_java_list(app: AppHandle) -> SJMCLResult<Vec<JavaInfo>> {
   refresh_and_update_javas(&app).await; // firstly refresh and update
   let binding = app.state::<Mutex<Vec<JavaInfo>>>();

@@ -48,6 +48,7 @@ const AppearanceSettingsPage = () => {
   );
 
   const [fonts, setFonts] = useState<string[]>([]);
+  const [customFonts, setCustomFonts] = useState<string[]>([]);
 
   const [customBgList, setCustomBgList] = useState<Record<string, string>[]>(
     []
@@ -63,6 +64,36 @@ const AppearanceSettingsPage = () => {
     };
     handleRetrieveFontList();
   }, []);
+
+  const handleRetrieveCustomFontList = useCallback(() => {
+    ConfigService.retrieveCustomFontList().then((response) => {
+      if (response.status === "success") setCustomFonts(response.data);
+    });
+  }, []);
+
+  useEffect(() => {
+    handleRetrieveCustomFontList();
+  }, [handleRetrieveCustomFontList]);
+
+  const handleAddCustomFont = () => {
+    open({
+      multiple: false,
+      filters: [{ name: "Font", extensions: ["ttf", "otf", "woff", "woff2"] }],
+    }).then((selectedPath) => {
+      if (!selectedPath) return;
+      ConfigService.addCustomFont(selectedPath).then((response) => {
+        if (response.status === "success") {
+          handleRetrieveCustomFontList();
+          window.dispatchEvent(new Event("custom-fonts-updated"));
+        } else
+          toast({
+            title: response.message,
+            description: response.details,
+            status: "error",
+          });
+      });
+    });
+  };
 
   const handleRetrieveCustomBackgroundList = useCallback(() => {
     appDataDir()
@@ -191,6 +222,7 @@ const AppearanceSettingsPage = () => {
   };
 
   const buildFontName = (font: string) => {
+    if (font.startsWith("%custom:")) return removeFileExt(font.slice(8));
     return font === "%built-in"
       ? t("AppearanceSettingsPage.font.settings.fontFamily.default")
       : font;
@@ -204,24 +236,40 @@ const AppearanceSettingsPage = () => {
     onChange: (v: string) => void;
   }) => {
     return (
-      <MenuSelector
-        options={fonts.map((font) => ({
-          value: font,
-          label: (
-            <Text
-              fontFamily={font === "%built-in" ? "-apple-system, Sinter" : font}
-              fontSize="xs"
-            >
-              {buildFontName(font)}
-            </Text>
-          ),
-        }))}
-        value={value}
-        onSelect={(v) => onChange(v as string)}
-        placeholder={buildFontName(value)}
-        isLazy
-        menuListProps={{ maxH: "40vh", overflowY: "auto" }}
-      />
+      <HStack>
+        <MenuSelector
+          options={[
+            ...fonts,
+            ...customFonts.map((font) => `%custom:${font}`),
+          ].map((font) => ({
+            value: font,
+            searchText: buildFontName(font),
+            label: (
+              <Text
+                fontFamily={
+                  font === "%built-in" ? "-apple-system, Sinter" : font
+                }
+                fontSize="xs"
+              >
+                {buildFontName(font)}
+              </Text>
+            ),
+          }))}
+          value={value}
+          onSelect={(v) => onChange(v as string)}
+          placeholder={buildFontName(value)}
+          isSearchable
+          virtualized
+          isLazy
+        />
+        <Tooltip label={t("General.add")}>
+          <IconButton
+            icon={<Icon as={LuPlus} />}
+            aria-label="add-custom-font"
+            onClick={handleAddCustomFont}
+          />
+        </Tooltip>
+      </HStack>
     );
   };
 
@@ -504,15 +552,10 @@ const AppearanceSettingsPage = () => {
             />
           ),
         },
-        // font size settings cannot work in Windows now: https://github.com/UNIkeEN/SJMCL/issues/376
-        ...(config.basicInfo.osType !== "windows"
-          ? [
-              {
-                title: t("AppearanceSettingsPage.font.settings.fontSize.title"),
-                children: <FontSizeSlider />,
-              },
-            ]
-          : []),
+        {
+          title: t("AppearanceSettingsPage.font.settings.fontSize.title"),
+          children: <FontSizeSlider />,
+        },
       ],
     },
     {

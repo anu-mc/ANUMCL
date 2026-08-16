@@ -98,6 +98,8 @@ pub async fn run() {
         launcher_config::commands::retrieve_custom_background_list,
         launcher_config::commands::add_custom_background,
         launcher_config::commands::delete_custom_background,
+        launcher_config::commands::retrieve_custom_font_list,
+        launcher_config::commands::add_custom_font,
         launcher_config::commands::retrieve_java_list,
         launcher_config::commands::validate_java,
         launcher_config::commands::download_mojang_java,

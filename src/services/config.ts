@@ -112,6 +112,18 @@ export class ConfigService {
     return await invoke("delete_custom_background", { fileName });
   }
 
+  @responseHandler("config")
+  static async retrieveCustomFontList(): Promise<InvokeResponse<string[]>> {
+    return await invoke("retrieve_custom_font_list");
+  }
+
+  @responseHandler("config")
+  static async addCustomFont(
+    sourceSrc: string
+  ): Promise<InvokeResponse<string>> {
+    return await invoke("add_custom_font", { sourceSrc });
+  }
+
   /**
    * RETRIEVE the list of installed Java versions.
    * @returns {Promise<InvokeResponse<JavaInfo[]>>} A list of installed Java versions.

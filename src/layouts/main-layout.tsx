@@ -39,6 +39,7 @@ import WindowTitlebar from "@/components/window-titlebar";
 import { useLauncherConfig } from "@/contexts/config";
 import { useExtensionHost } from "@/contexts/extension/host";
 import { useSharedModals } from "@/contexts/shared-modal";
+import { ConfigService } from "@/services/config";
 import { isDev } from "@/utils/env";
 
 interface MainLayoutProps {
@@ -214,12 +215,41 @@ const MainLayout = ({ children }: MainLayoutProps) => {
 
     if (fontFamily !== "%built-in") {
       body.setAttribute("use-custom-font", "true");
-      body.style.setProperty("--custom-global-font-family", fontFamily);
+      body.style.setProperty(
+        "--custom-global-font-family",
+        fontFamily.startsWith("%custom:") ? `"${fontFamily}"` : fontFamily
+      );
     } else {
       body.removeAttribute("use-custom-font");
       body.style.removeProperty("--custom-global-font-family");
     }
   }, [config.appearance.font.fontFamily]);
+
+  useEffect(() => {
+    let style: HTMLStyleElement | undefined;
+    const loadCustomFonts = async () => {
+      const [dir, response] = await Promise.all([
+        appDataDir(),
+        ConfigService.retrieveCustomFontList(),
+      ]);
+      if (response.status !== "success") return;
+      style?.remove();
+      style = document.createElement("style");
+      style.textContent = response.data
+        .map(
+          (fileName) =>
+            `@font-face { font-family: ${JSON.stringify(`%custom:${fileName}`)}; src: url(${JSON.stringify(convertFileSrc(`${dir}/UserContent/Fonts/${fileName}`))}); }`
+        )
+        .join("\n");
+      document.head.appendChild(style);
+    };
+    void loadCustomFonts();
+    window.addEventListener("custom-fonts-updated", loadCustomFonts);
+    return () => {
+      window.removeEventListener("custom-fonts-updated", loadCustomFonts);
+      style?.remove();
+    };
+  }, []);
 
   // update font size to body CSS by config.
   useEffect(() => {
