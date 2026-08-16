@@ -320,8 +320,8 @@ const AppearanceSettingsPage = () => {
 
   const PresetBackgroundList = () => {
     const presetBgList = [
-      { key: "the-tower", thumbnail: "the-tower-thumbnail.png" },
-      { key: "zheshan-gate", thumbnail: "zheshan-gate-thumbnail.png" },
+      { key: "the-tower", thumbnail: "the-tower-thumbnail.webp" },
+      { key: "zheshan-gate", thumbnail: "zheshan-gate-thumbnail.webp" },
     ];
 
     return (

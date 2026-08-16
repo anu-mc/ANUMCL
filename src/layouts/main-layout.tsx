@@ -194,7 +194,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       const bgKey = config.appearance.background.choice;
       if (bgKey.startsWith("%built-in:")) {
         const builtInKey = bgKey.replace("%built-in:", "");
-        setBgImgSrc(`/images/backgrounds/${builtInKey}-${colorMode}.png`);
+        setBgImgSrc(`/images/backgrounds/${builtInKey}-${colorMode}.webp`);
       } else {
         const _appDataDir = await appDataDir();
         setBgImgSrc(
