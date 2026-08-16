@@ -1,3 +1,5 @@
+import { isChakraColor } from "@/enums/misc";
+
 const COLOR_STOPS = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
 const COLOR_MIXES: Record<number, number> = {
   50: 0.92,
@@ -40,4 +42,31 @@ export const applyCustomPrimaryColor = (color: string) => {
       mixColor(normalized, COLOR_MIXES[stop])
     );
   });
+};
+
+export const applyInterfaceBackgroundColor = (
+  color: string,
+  customColor: string,
+  colorMode: "light" | "dark"
+) => {
+  const resolvedColor = color === "custom" ? customColor : "";
+
+  if (/^#[0-9a-f]{6}$/i.test(resolvedColor)) {
+    document.documentElement.style.setProperty(
+      "--ahnumcl-interface-background",
+      resolvedColor
+    );
+  } else if (isChakraColor(color)) {
+    const shade = colorMode === "dark" ? 900 : 50;
+    document.documentElement.style.setProperty(
+      "--ahnumcl-interface-background",
+      colorMode === "dark"
+        ? `color-mix(in srgb, var(--chakra-colors-${color}-${shade}) 65%, black)`
+        : `var(--chakra-colors-${color}-${shade})`
+    );
+  } else {
+    document.documentElement.style.removeProperty(
+      "--ahnumcl-interface-background"
+    );
+  }
 };

@@ -291,6 +291,9 @@
           "title": "Launcher Primary Color",
           "custom": "Custom color"
         },
+        "interfaceBackgroundColor": {
+          "title": "Interface Background Color"
+        },
         "colorMode": {
           "title": "Color Mode",
           "type": {
@@ -345,6 +348,9 @@
         },
         "autoDarken": {
           "title": "Dim Background in Dark Mode"
+        },
+        "windowOpacity": {
+          "title": "Window Opacity"
         }
       },
       "presetBgList": {

@@ -291,6 +291,9 @@
           "title": "啟者強調色",
           "custom": "自訂色"
         },
+        "interfaceBackgroundColor": {
+          "title": "介面背景色"
+        },
         "colorMode": {
           "title": "色式",
           "type": {
@@ -345,6 +348,9 @@
         },
         "autoDarken": {
           "title": "暗模式下調暗繪景"
+        },
+        "windowOpacity": {
+          "title": "窗透度"
         }
       },
       "presetBgList": {

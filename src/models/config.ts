@@ -97,6 +97,10 @@ export interface LauncherConfig {
     theme: {
       primaryColor: string;
       customPrimaryColor: string;
+      interfaceBackgroundColor: string;
+      interfaceBackgroundCustomColor: string;
+      interfaceBackgroundDarkColor: string;
+      interfaceBackgroundDarkCustomColor: string;
       colorMode: "light" | "dark" | "system";
       useLiquidGlassDesign: boolean;
       headNavStyle: "standard" | "simplified" | "adaptive";
@@ -110,6 +114,7 @@ export interface LauncherConfig {
       choice: string;
       randomCustom: boolean;
       autoDarken: boolean;
+      windowOpacity: number;
     };
     accessibility: {
       invertColors: boolean;
@@ -294,6 +299,10 @@ export const defaultConfig: LauncherConfig = {
     theme: {
       primaryColor: "blue",
       customPrimaryColor: "#3182ce",
+      interfaceBackgroundColor: "custom",
+      interfaceBackgroundCustomColor: "#fafafa",
+      interfaceBackgroundDarkColor: "custom",
+      interfaceBackgroundDarkCustomColor: "#1a202c",
       colorMode: "light",
       useLiquidGlassDesign: false,
       headNavStyle: "adaptive",
@@ -307,6 +316,7 @@ export const defaultConfig: LauncherConfig = {
       choice: "%built-in:zheshan-gate",
       randomCustom: false,
       autoDarken: false,
+      windowOpacity: 100,
     },
     accessibility: {
       invertColors: false,

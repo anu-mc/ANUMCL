@@ -291,6 +291,9 @@
           "title": "ランチャーのアクセントカラー",
           "custom": "カスタムカラー"
         },
+        "interfaceBackgroundColor": {
+          "title": "インターフェース背景色"
+        },
         "colorMode": {
           "title": "カラーモード",
           "type": {
@@ -345,6 +348,9 @@
         },
         "autoDarken": {
           "title": "ダークモード時にバックグラウンドを暗くする"
+        },
+        "windowOpacity": {
+          "title": "ウィンドウの不透明度"
         }
       },
       "presetBgList": {

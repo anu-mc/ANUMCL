@@ -90,8 +90,9 @@ export const ChakraColorSelectPopover: React.FC<
       <PopoverTrigger>
         <IconButton
           size={size}
-          colorScheme={current || "gray"}
+          colorScheme={current === "custom" ? "gray" : current || "gray"}
           variant={hasSelectedColor ? "solid" : "outline"}
+          bg={current === "custom" ? customColor : undefined}
           aria-label="color"
           icon={<LuChevronDown />}
         />

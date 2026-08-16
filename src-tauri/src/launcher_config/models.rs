@@ -264,6 +264,14 @@ structstruck::strike! {
         pub primary_color: String,
         #[default = "#3182ce"]
         pub custom_primary_color: String,
+        #[default = "custom"]
+        pub interface_background_color: String,
+        #[default = "#fafafa"]
+        pub interface_background_custom_color: String,
+        #[default = "custom"]
+        pub interface_background_dark_color: String,
+        #[default = "#1a202c"]
+        pub interface_background_dark_custom_color: String,
         #[default = "light"]
         pub color_mode: String,
         pub use_liquid_glass_design: bool,
@@ -284,6 +292,8 @@ structstruck::strike! {
         pub choice: String,
         pub random_custom: bool,
         pub auto_darken: bool,
+        #[default = 100]
+        pub window_opacity: usize,
       },
       pub accessibility: struct {
         pub invert_colors: bool,

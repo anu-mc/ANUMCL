@@ -19,7 +19,10 @@ import {
 import { JavaInfo } from "@/models/misc";
 import { ConfigService } from "@/services/config";
 import { updateByKeyPath } from "@/utils/partial";
-import { applyCustomPrimaryColor } from "@/utils/theme";
+import {
+  applyCustomPrimaryColor,
+  applyInterfaceBackgroundColor,
+} from "@/utils/theme";
 
 interface LauncherConfigContextType {
   config: LauncherConfig;
@@ -126,6 +129,29 @@ export const LauncherConfigContextProvider: React.FC<{
   useEffect(() => {
     applyCustomPrimaryColor(config.appearance.theme.customPrimaryColor);
   }, [config.appearance.theme.customPrimaryColor]);
+
+  useEffect(() => {
+    const interfaceBackgroundColor =
+      colorMode === "dark"
+        ? config.appearance.theme.interfaceBackgroundDarkColor
+        : config.appearance.theme.interfaceBackgroundColor;
+    const interfaceBackgroundCustomColor =
+      colorMode === "dark"
+        ? config.appearance.theme.interfaceBackgroundDarkCustomColor
+        : config.appearance.theme.interfaceBackgroundCustomColor;
+
+    applyInterfaceBackgroundColor(
+      interfaceBackgroundColor,
+      interfaceBackgroundCustomColor,
+      colorMode
+    );
+  }, [
+    colorMode,
+    config.appearance.theme.interfaceBackgroundColor,
+    config.appearance.theme.interfaceBackgroundCustomColor,
+    config.appearance.theme.interfaceBackgroundDarkColor,
+    config.appearance.theme.interfaceBackgroundDarkCustomColor,
+  ]);
 
   useEffect(() => {
     const media = window.matchMedia("(prefers-color-scheme: dark)");

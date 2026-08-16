@@ -291,6 +291,9 @@
           "title": "Couleur principale du lanceur",
           "custom": "Couleur personnalisée"
         },
+        "interfaceBackgroundColor": {
+          "title": "Couleur de fond de l'interface"
+        },
         "colorMode": {
           "title": "Mode de couleur",
           "type": {
@@ -345,6 +348,9 @@
         },
         "autoDarken": {
           "title": "Assombrir l'arrière-plan en mode sombre."
+        },
+        "windowOpacity": {
+          "title": "Opacité de la fenêtre"
         }
       },
       "presetBgList": {

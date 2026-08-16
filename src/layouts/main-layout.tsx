@@ -54,6 +54,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   const { colorMode } = useColorMode();
   const isDarkenBg =
     colorMode === "dark" && config.appearance.background.autoDarken;
+  const windowOpacity = config.appearance.background.windowOpacity / 100;
   const { openGenericConfirmDialog } = useSharedModals();
 
   const [bgImgSrc, setBgImgSrc] = useState<string>("");
@@ -339,7 +340,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       bgBlendMode={isDarkenBg ? "darken" : "normal"}
       {...(config.basicInfo.osType === "linux" && linuxBorderStyle)}
       overflow="hidden"
-      style={getGlobalExtraStyle(config)}
+      style={{ ...getGlobalExtraStyle(config), opacity: windowOpacity }}
     >
       <WindowTitlebar />
       <Box

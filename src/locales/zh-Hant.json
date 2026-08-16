@@ -291,6 +291,9 @@
           "title": "啟動器強調色",
           "custom": "自訂顏色"
         },
+        "interfaceBackgroundColor": {
+          "title": "介面背景色"
+        },
         "colorMode": {
           "title": "顏色模式",
           "type": {
@@ -345,6 +348,9 @@
         },
         "autoDarken": {
           "title": "深色模式下調暗背景"
+        },
+        "windowOpacity": {
+          "title": "視窗透明度"
         }
       },
       "presetBgList": {

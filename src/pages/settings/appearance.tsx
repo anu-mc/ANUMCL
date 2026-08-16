@@ -15,6 +15,7 @@ import {
   VStack,
   Wrap,
   WrapItem,
+  useColorMode,
 } from "@chakra-ui/react";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { appDataDir } from "@tauri-apps/api/path";
@@ -39,6 +40,7 @@ const AppearanceSettingsPage = () => {
   const { t } = useTranslation();
   const { config, update } = useLauncherConfig();
   const toast = useToast();
+  const { colorMode } = useColorMode();
   const appearanceConfigs = config.appearance;
   const primaryColor = appearanceConfigs.theme.primaryColor;
   const builtInBgPrefix = "%built-in:";
@@ -49,6 +51,29 @@ const AppearanceSettingsPage = () => {
 
   const [fonts, setFonts] = useState<string[]>([]);
   const [customFonts, setCustomFonts] = useState<string[]>([]);
+  const [interfaceBackgroundColorMode, setInterfaceBackgroundColorMode] =
+    useState<"light" | "dark">("light");
+
+  useEffect(() => {
+    setInterfaceBackgroundColorMode(colorMode);
+  }, [colorMode]);
+
+  const interfaceBackgroundColor =
+    interfaceBackgroundColorMode === "dark"
+      ? {
+          color: appearanceConfigs.theme.interfaceBackgroundDarkColor,
+          customColor:
+            appearanceConfigs.theme.interfaceBackgroundDarkCustomColor,
+          colorPath: "appearance.theme.interfaceBackgroundDarkColor",
+          customColorPath:
+            "appearance.theme.interfaceBackgroundDarkCustomColor",
+        }
+      : {
+          color: appearanceConfigs.theme.interfaceBackgroundColor,
+          customColor: appearanceConfigs.theme.interfaceBackgroundCustomColor,
+          colorPath: "appearance.theme.interfaceBackgroundColor",
+          customColorPath: "appearance.theme.interfaceBackgroundCustomColor",
+        };
 
   const [customBgList, setCustomBgList] = useState<Record<string, string>[]>(
     []
@@ -306,6 +331,31 @@ const AppearanceSettingsPage = () => {
     );
   };
 
+  const WindowOpacitySlider = () => {
+    return (
+      <HStack spacing={2}>
+        <Text fontSize="xs">50%</Text>
+        <Slider
+          value={appearanceConfigs.background.windowOpacity}
+          min={50}
+          max={100}
+          step={5}
+          w={32}
+          colorScheme={primaryColor}
+          onChange={(value) => {
+            update("appearance.background.windowOpacity", value);
+          }}
+        >
+          <SliderTrack>
+            <SliderFilledTrack />
+          </SliderTrack>
+          <SliderThumb />
+        </Slider>
+        <Text fontSize="xs">100%</Text>
+      </HStack>
+    );
+  };
+
   interface BackgroundCardProps {
     bgAlt: string;
     bgSrc: string;
@@ -474,6 +524,39 @@ const AppearanceSettingsPage = () => {
           ),
         },
         {
+          title: t(
+            "AppearanceSettingsPage.theme.settings.interfaceBackgroundColor.title"
+          ),
+          children: (
+            <HStack spacing={2}>
+              <SegmentedControl
+                selected={interfaceBackgroundColorMode}
+                onSelectItem={(mode) => {
+                  setInterfaceBackgroundColorMode(mode as "light" | "dark");
+                }}
+                size="xs"
+                items={["light", "dark"].map((mode) => ({
+                  label: t(
+                    `AppearanceSettingsPage.theme.settings.colorMode.type.${mode}`
+                  ),
+                  value: mode,
+                }))}
+              />
+              <ChakraColorSelectPopover
+                current={interfaceBackgroundColor.color}
+                onColorSelect={(color) => {
+                  update(interfaceBackgroundColor.colorPath, color);
+                }}
+                customColor={interfaceBackgroundColor.customColor}
+                onCustomColorChange={(color) => {
+                  update(interfaceBackgroundColor.customColorPath, color);
+                  update(interfaceBackgroundColor.colorPath, "custom");
+                }}
+              />
+            </HStack>
+          ),
+        },
+        {
           title: t("AppearanceSettingsPage.theme.settings.colorMode.title"),
           children: (
             <SegmentedControl
@@ -610,6 +693,12 @@ const AppearanceSettingsPage = () => {
               }}
             />
           ),
+        },
+        {
+          title: t(
+            "AppearanceSettingsPage.background.settings.windowOpacity.title"
+          ),
+          children: <WindowOpacitySlider />,
         },
       ],
     },
