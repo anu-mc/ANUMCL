@@ -2,6 +2,16 @@
 
 AHNUMCL follows [Semantic Versioning 2.0.0](https://semver.org/).
 
+## 1.0.4
+
+`2026-08-17`
+
+- 🚀 Improve download throughput with higher automatic concurrency, resilient retries, and HTTP Range resume support.
+- 🚀 Select official and mirror sources using PCL-CE-style timeouts and fallback ordering, preferring fast direct connections when available.
+- 🐛 Fix CurseForge API and CDN access, modpack imports without a proxy, and stalled or unknown-size download progress indicators.
+- 🐛 Preserve CurseForge API keys containing special characters and add mirror fallback for Authlib-Injector metadata and JAR downloads.
+- 🌟 Add a latest-log viewer in instance settings with search, copy, and direct file access.
+
 ## 1.0.3
 
 `2026-08-16`

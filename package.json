@@ -1,6 +1,6 @@
 {
   "name": "ahnumcl",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "private": true,
   "browserslist": [
     "Safari >= 14"
