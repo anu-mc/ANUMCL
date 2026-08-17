@@ -106,8 +106,9 @@ const DownloadSpecificResourceModal: React.FC<
     config.general.functionality.translatedFilenamePrefix;
 
   const [gameVersionList, setGameVersionList] = useState<string[]>([]);
-  const [versionLabels, setVersionLabels] = useState<string[]>([]);
-  const [selectedVersionLabel, setSelectedVersionLabel] = useState<string>("");
+  const [versionLabels, setVersionLabels] = useState<string[]>(["All"]);
+  const [selectedVersionLabel, setSelectedVersionLabel] =
+    useState<string>("All");
   const [selectedModLoader, setSelectedModLoader] = useState<
     ModLoaderType | "All"
   >(curInstanceModLoader || "All");
@@ -454,7 +455,8 @@ const DownloadSpecificResourceModal: React.FC<
         ];
         setVersionLabels(["All", ...majorVersions]);
       } else {
-        setVersionLabels([]);
+        setVersionLabels(["All"]);
+        setSelectedVersionLabel("All");
       }
     });
   }, [getGameVersionList]);

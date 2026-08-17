@@ -97,6 +97,43 @@ pub async fn apply_other_resource_enhancements(
   app: &AppHandle,
   resource_info: &mut OtherResourceInfo,
 ) -> SJMCLResult<()> {
+  if apply_cached_other_resource_enhancements(app, resource_info) {
+    return Ok(());
+  }
+
+  let translated_desc = translate_resource_description(app, resource_info).await?;
+  let description_translated = translated_desc
+    .as_deref()
+    .is_some_and(|desc| !desc.trim().is_empty());
+
+  let translation_cache_key =
+    ResourceTranslationsCache::cache_key(&resource_info.source, &resource_info.id);
+  if let Ok(mut cache) = app.state::<Mutex<ResourceTranslationsCache>>().lock() {
+    cache.translations.insert(
+      translation_cache_key,
+      ResourceTranslationEntry::new(
+        resource_info.translated_name.clone(),
+        translated_desc.clone(),
+        description_translated,
+      ),
+    );
+    let _ = cache.save();
+  }
+
+  if let Some(desc) = translated_desc {
+    resource_info.translated_description = Some(desc);
+  }
+
+  Ok(())
+}
+
+/// Applies local metadata and cached translations. Returns true when no online
+/// translation request is needed. List endpoints deliberately use this path so
+/// an unavailable translation service cannot delay resource search results.
+fn apply_cached_other_resource_enhancements(
+  app: &AppHandle,
+  resource_info: &mut OtherResourceInfo,
+) -> bool {
   // Extract data from cache in a limited scope to avoid holding lock across await
   let (translated_name, mcmod_id) = {
     if let Ok(cache) = app.state::<Mutex<ModDataBase>>().lock() {
@@ -122,7 +159,7 @@ pub async fn apply_other_resource_enhancements(
   }
 
   if !should_translate_resource_description(app) {
-    return Ok(());
+    return true;
   }
 
   let translation_cache_key =
@@ -138,33 +175,12 @@ pub async fn apply_other_resource_enhancements(
       }
       if entry.translated_description.is_some() || entry.description_translated {
         resource_info.translated_description = entry.translated_description.clone();
-        return Ok(());
+        return true;
       }
     }
   }
 
-  let translated_desc = translate_resource_description(app, resource_info).await?;
-  let description_translated = translated_desc
-    .as_deref()
-    .is_some_and(|desc| !desc.trim().is_empty());
-
-  if let Ok(mut cache) = app.state::<Mutex<ResourceTranslationsCache>>().lock() {
-    cache.translations.insert(
-      translation_cache_key,
-      ResourceTranslationEntry::new(
-        resource_info.translated_name.clone(),
-        translated_desc.clone(),
-        description_translated,
-      ),
-    );
-    let _ = cache.save();
-  }
-
-  if let Some(desc) = translated_desc {
-    resource_info.translated_description = Some(desc);
-  }
-
-  Ok(())
+  false
 }
 
 pub async fn apply_other_resource_enhancements_concurrently(
@@ -178,7 +194,7 @@ pub async fn apply_other_resource_enhancements_concurrently(
 
   let mut enhanced = futures::stream::iter(std::mem::take(list).into_iter().enumerate())
     .map(|(index, mut resource_info)| async move {
-      let _ = apply_other_resource_enhancements(app, &mut resource_info).await;
+      let _ = apply_cached_other_resource_enhancements(app, &mut resource_info);
       (index, resource_info)
     })
     .buffer_unordered(concurrency)

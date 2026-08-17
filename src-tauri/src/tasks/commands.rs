@@ -19,6 +19,7 @@ pub async fn schedule_progressive_task_group(
   let monitor = app.state::<Pin<Box<TaskMonitor>>>();
   let mut task_descs = Vec::new();
   let mut future_descs = Vec::new();
+  let allow_parallel_chunks = params.len() == 1;
   let task_group = if with_timestamp {
     // If with_timestamp is true, append a timestamp to the task group name
     // to ensure uniqueness and avoid conflicts.
@@ -44,9 +45,10 @@ pub async fn schedule_progressive_task_group(
           Some(task_group.clone()),
           param,
           Duration::from_secs(1),
+          allow_parallel_chunks,
         );
         let (f, h) = task
-          .future(app.clone(), monitor.download_rate_limiter.clone())
+          .future(app.clone(), monitor.download_rate_limiter())
           .await?;
         let task_desc = h.read().unwrap().desc.clone();
         let future_desc = SJMCLFutureDesc {

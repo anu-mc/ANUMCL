@@ -27,6 +27,7 @@ where
   #[pin]
   stream: M,
   handle: Arc<RwLock<PHandle<S, P>>>,
+  complete_on_end: bool,
 }
 
 impl<M, U, S, P> ProgressStream<M, U, S, P>
@@ -37,7 +38,19 @@ where
   P: Clone + Serialize + for<'de> Deserialize<'de>,
 {
   pub fn new(stream: M, handle: Arc<RwLock<PHandle<S, P>>>) -> Self {
-    Self { stream, handle }
+    Self {
+      stream,
+      handle,
+      complete_on_end: true,
+    }
+  }
+
+  pub fn new_without_completion(stream: M, handle: Arc<RwLock<PHandle<S, P>>>) -> Self {
+    Self {
+      stream,
+      handle,
+      complete_on_end: false,
+    }
   }
 }
 
@@ -71,7 +84,7 @@ where
       let mut h = p.handle.write().unwrap();
       if let Some(item) = &opt {
         h.report_progress(cx, item.unit_size());
-      } else {
+      } else if *p.complete_on_end {
         h.mark_completed();
       }
       opt

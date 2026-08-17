@@ -106,6 +106,14 @@ where
     }
   }
 
+  pub fn reset_progress(&mut self) {
+    self.desc.current = 0;
+    self.desc.total = 0;
+    self.desc.save(&self.path).unwrap();
+    self.reporter.set_total(0);
+    self.reporter.reset_progress();
+  }
+
   pub fn report_progress(&mut self, cx: &mut Context<'_>, incr: i64) {
     self.desc.increment_progress(incr);
     if self.interval.poll_tick(cx).is_ready() {

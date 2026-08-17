@@ -314,7 +314,9 @@ const ResourceDownloader: React.FC<ResourceDownloaderProps> = ({
   const [pageSize, setPageSize] = useState<number>(20);
 
   const [searchQuery, setSearchQuery] = useState<string>(initialSearchQuery);
-  const [gameVersion, setGameVersion] = useState<string>("");
+  // Community resources can be browsed without the Minecraft manifest. Keep
+  // the API's all-versions query available when metadata is offline.
+  const [gameVersion, setGameVersion] = useState<string>("All");
   const [selectedTag, setSelectedTag] = useState<string>("All");
   const [sortBy, setSortBy] = useState<string>(
     initialDownloadSource === OtherResourceSource.CurseForge
@@ -451,7 +453,8 @@ const ResourceDownloader: React.FC<ResourceDownloaderProps> = ({
           .map((version: GameClientResourceInfo) => version.id);
         setGameVersionList(["All", ...versionList]);
       } else {
-        setGameVersionList([]);
+        setGameVersionList(["All"]);
+        setGameVersion("All");
       }
     });
   }, [getGameVersionList]);

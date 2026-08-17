@@ -5,16 +5,16 @@ use std::fs::File;
 use std::io::Read;
 use std::path::Path;
 use std::str::FromStr;
-use tauri::{AppHandle, Manager};
-use tauri_plugin_http::reqwest;
+use tauri::AppHandle;
 use zip::ZipArchive;
 
 use crate::instance::helpers::modpack::import::{ModpackManifest, ModpackMetaInfo};
 use crate::instance::models::misc::{InstanceError, ModLoader, ModLoaderType};
-use crate::resource::helpers::curseforge::misc::{CURSEFORGE_API_KEY, CurseForgeProject};
-use crate::resource::models::OtherResourceSource;
+use crate::resource::helpers::curseforge::misc::{CurseForgeProject, make_curseforge_request};
+use crate::resource::models::{OtherResourceRequestType, OtherResourceSource};
 use crate::tasks::PTaskParam;
 use crate::tasks::download::DownloadParam;
+use crate::utils::fs::normalize_relative_path;
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -138,47 +138,33 @@ impl ModpackManifest for CurseForgeManifest {
     app: &AppHandle,
     instance_path: &Path,
   ) -> SJMCLResult<Vec<PTaskParam>> {
-    let client = app.state::<reqwest::Client>();
     let instance_path = instance_path.to_path_buf();
 
     let tasks = self.files.iter().map(|file| {
-      let client = client.clone();
+      let app = app.clone();
       let instance_path = instance_path.clone();
       let file_id = file.file_id;
       let project_id = file.project_id;
 
       async move {
         let class_id = {
-          let project_resp = client
-            .get(format!("https://api.curseforge.com/v1/mods/{project_id}"))
-            .header("x-api-key", CURSEFORGE_API_KEY.as_str())
-            .header("accept", "application/json")
-            .send()
-            .await
-            .map_err(|_| InstanceError::NetworkError)?;
-          let project: CurseForgeProjectRes = project_resp.json().await?;
+          let project = make_curseforge_request::<CurseForgeProjectRes, ()>(
+            &app,
+            &format!("https://api.curseforge.com/v1/mods/{project_id}"),
+            OtherResourceRequestType::Get,
+          )
+          .await
+          .map_err(|_| InstanceError::NetworkError)?;
           project.data.class_id
         };
 
-        let file_manifest: CurseForgeFileManifest = {
-          let file_resp = client
-            .get(format!(
-              "https://api.curseforge.com/v1/mods/{project_id}/files/{file_id}"
-            ))
-            .header("x-api-key", CURSEFORGE_API_KEY.as_str())
-            .header("accept", "application/json")
-            .send()
-            .await
-            .map_err(|_| InstanceError::NetworkError)?;
-
-          if !file_resp.status().is_success() {
-            return Err(InstanceError::NetworkError.into());
-          }
-          file_resp.json().await.map_err(|e| {
-            eprintln!("{:?}", e);
-            InstanceError::CurseForgeFileManifestParseError
-          })?
-        };
+        let file_manifest = make_curseforge_request::<CurseForgeFileManifest, ()>(
+          &app,
+          &format!("https://api.curseforge.com/v1/mods/{project_id}/files/{file_id}"),
+          OtherResourceRequestType::Get,
+        )
+        .await
+        .map_err(|_| InstanceError::CurseForgeFileManifestParseError)?;
 
         let download_url = file_manifest.data.download_url.unwrap_or(format!(
           "https://edge.forgecdn.net/files/{}/{}/{}",
@@ -194,6 +180,12 @@ impl ModpackManifest for CurseForgeManifest {
           .and_then(|hs| hs.iter().find(|h| h.algo == 1))
           .map(|h| h.value.clone());
 
+        let file_name = normalize_relative_path(Path::new(&file_manifest.data.file_name))
+          .ok()
+          .filter(|path| path.components().count() == 1)
+          .and_then(|path| path.to_str().map(str::to_owned))
+          .ok_or(InstanceError::InvalidSourcePath)?;
+
         let task_param = PTaskParam::Download(DownloadParam {
           src: url::Url::parse(&download_url).map_err(|_| InstanceError::InvalidSourcePath)?,
           sha1,
@@ -203,8 +195,8 @@ impl ModpackManifest for CurseForgeManifest {
               Some(6552) => "shaderpacks",
               _ => "mods",
             })
-            .join(&file_manifest.data.file_name),
-          filename: Some(file_manifest.data.file_name.clone()),
+            .join(&file_name),
+          filename: Some(file_name),
         });
 
         Ok::<PTaskParam, SJMCLError>(task_param)

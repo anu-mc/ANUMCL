@@ -2,7 +2,7 @@ pub mod misc;
 
 use hex;
 use misc::{
-  CurseForgeFileInfo, CurseForgeFingerprintRes, CurseForgeGetProjectRes, CurseForgeSearchRes,
+  CurseForgeFingerprintRes, CurseForgeGetProjectRes, CurseForgeSearchRes,
   CurseForgeVersionPackSearchRes, cvt_category_to_id, cvt_mod_loader_to_id, cvt_sort_by_to_id,
   cvt_type_to_class_id, get_curseforge_api, make_curseforge_request,
   map_curseforge_file_to_version_pack,
@@ -12,8 +12,7 @@ use serde_json::json;
 use sha1::{Digest, Sha1};
 use sjmcl_types::error::SJMCLResult;
 use std::collections::HashMap;
-use tauri::{AppHandle, Manager};
-use tauri_plugin_http::reqwest;
+use tauri::AppHandle;
 
 use crate::resource::helpers::misc::{levenshtein_distance, sort_localized_search_results};
 use crate::resource::helpers::mod_db::{HandledSearchQuery, handle_localized_search_query};
@@ -87,9 +86,8 @@ pub async fn fetch_resource_list_by_name_curseforge(
   params.insert("index".to_string(), (page * page_size).to_string());
   params.insert("pageSize".to_string(), page_size.to_string());
 
-  let client = app.state::<reqwest::Client>();
   let results = make_curseforge_request::<CurseForgeSearchRes, ()>(
-    &client,
+    app,
     &url,
     OtherResourceRequestType::GetWithParams(&params),
   )
@@ -154,10 +152,6 @@ pub async fn fetch_resource_version_packs_curseforge(
   app: &AppHandle,
   query: &OtherResourceVersionPackQuery,
 ) -> SJMCLResult<Vec<OtherResourceVersionPack>> {
-  let mut aggregated_files: Vec<CurseForgeFileInfo> = Vec::new();
-  let mut page = 0;
-  let page_size = 50;
-
   let OtherResourceVersionPackQuery {
     resource_id,
     mod_loader,
@@ -165,44 +159,31 @@ pub async fn fetch_resource_version_packs_curseforge(
     ..
   } = query;
 
-  loop {
-    let url = get_curseforge_api(OtherResourceApiEndpoint::VersionPack, Some(resource_id))?;
-
-    let mut params = HashMap::new();
-    if mod_loader != ALL_FILTER {
-      params.insert(
-        "modLoaderType".to_string(),
-        cvt_mod_loader_to_id(mod_loader).to_string(),
-      );
-    }
-    if let Some(version) = game_versions.first()
-      && version != ALL_FILTER
-    {
-      params.insert("gameVersion".to_string(), version.to_string());
-    }
-    params.insert("index".to_string(), (page * page_size).to_string());
-    params.insert("pageSize".to_string(), page_size.to_string());
-
-    let client = app.state::<reqwest::Client>();
-
-    let results = make_curseforge_request::<CurseForgeVersionPackSearchRes, ()>(
-      &client,
-      &url,
-      OtherResourceRequestType::GetWithParams(&params),
-    )
-    .await?;
-
-    let has_more = results.pagination.total_count > (page + 1) * page_size;
-
-    aggregated_files.extend(results.data);
-
-    if !has_more {
-      break;
-    }
-    page += 1;
+  let url = get_curseforge_api(OtherResourceApiEndpoint::VersionPack, Some(resource_id))?;
+  let mut params = HashMap::new();
+  if mod_loader != ALL_FILTER {
+    params.insert(
+      "modLoaderType".to_string(),
+      cvt_mod_loader_to_id(mod_loader).to_string(),
+    );
   }
+  if let Some(version) = game_versions.first()
+    && version != ALL_FILTER
+  {
+    params.insert("gameVersion".to_string(), version.to_string());
+  }
+  // CurseForge accepts a large page here. This is the same approach used by
+  // PCL-CE and avoids dozens of serial API round trips for popular projects.
+  params.insert("pageSize".to_string(), "10000".to_string());
 
-  Ok(map_curseforge_file_to_version_pack(aggregated_files))
+  let results = make_curseforge_request::<CurseForgeVersionPackSearchRes, ()>(
+    app,
+    &url,
+    OtherResourceRequestType::GetWithParams(&params),
+  )
+  .await?;
+
+  Ok(map_curseforge_file_to_version_pack(results.data))
 }
 
 pub async fn fetch_remote_resource_by_local_curseforge(
@@ -230,9 +211,8 @@ pub async fn fetch_remote_resource_by_local_curseforge(
     "fingerprints": [hash]
   });
 
-  let client = app.state::<reqwest::Client>();
   let fingerprint_response = make_curseforge_request::<CurseForgeFingerprintRes, _>(
-    &client,
+    app,
     &url,
     OtherResourceRequestType::Post(&payload),
   )
@@ -261,10 +241,8 @@ pub async fn fetch_remote_resource_by_id_curseforge(
   resource_id: &str,
 ) -> SJMCLResult<OtherResourceInfo> {
   let url = get_curseforge_api(OtherResourceApiEndpoint::ById, Some(resource_id))?;
-  let client = app.state::<reqwest::Client>();
-
   let results = make_curseforge_request::<CurseForgeGetProjectRes, ()>(
-    &client,
+    app,
     &url,
     OtherResourceRequestType::Get,
   )

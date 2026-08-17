@@ -59,15 +59,16 @@ fn get_parsers() -> Vec<Parser> {
 
 impl ModLoader {
   pub async fn with_branch(&self, app: &AppHandle, mc_version: String) -> SJMCLResult<Self> {
-    let version_list =
-      fetch_mod_loader_version_list(app.clone(), mc_version, self.loader_type).await?;
-    if let Some(version) = version_list.iter().find(|v| v.version == self.version) {
+    if let Ok(version_list) =
+      fetch_mod_loader_version_list(app.clone(), mc_version, self.loader_type).await
+      && let Some(version) = version_list.iter().find(|v| v.version == self.version)
+    {
       return Ok(Self {
         branch: version.branch.clone(),
         ..self.clone()
       });
     }
-    Err(InstanceError::ModLoaderVersionParseError.into())
+    Ok(self.clone())
   }
 }
 

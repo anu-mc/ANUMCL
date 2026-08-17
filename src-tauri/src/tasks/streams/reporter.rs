@@ -46,6 +46,10 @@ where
     self.total = total;
   }
 
+  pub fn reset_progress(&mut self) {
+    self.last_reported = 0;
+  }
+
   pub fn from_desc_interval<T: Clone + Serialize + for<'de> Deserialize<'de>>(
     desc: &PDesc<T>,
     interval: &Duration,

@@ -21,6 +21,7 @@ use crate::tasks::{SJMCLFuture, *};
 pub struct GroupMonitor {
   pub phs: HashMap<u32, Arc<RwLock<PTaskHandle>>>,
   pub status: GEventStatus,
+  pub failed: bool,
 }
 
 pub struct TaskMonitor {
@@ -34,10 +35,22 @@ pub struct TaskMonitor {
   rx: FlumeReceiver<SJMCLFuture>,
   group_map: Arc<RwLock<HashMap<String, GroupMonitor>>>,
   stopped_futures: Arc<Mutex<Vec<SJMCLFuture>>>,
-  pub download_rate_limiter: Option<Limiter>,
+  download_rate_limiter: Mutex<Option<(bool, usize, Limiter)>>,
 }
 
 impl TaskMonitor {
+  fn auto_concurrency() -> usize {
+    std::thread::available_parallelism()
+      .map(usize::from)
+      .unwrap_or(4)
+      // Large modpacks usually hit a handful of CDN origins. Starting dozens
+      // of connections to each origin triggers their per-client throttling and
+      // makes every individual file crawl. Keep automatic mode conservative;
+      // users can still opt into a higher manual limit.
+      .saturating_mul(2)
+      .clamp(8, 16)
+  }
+
   pub fn new(app_handle: AppHandle) -> Self {
     let config = retrieve_launcher_config(app_handle.clone()).unwrap();
     let (tx, rx) = flume::unbounded();
@@ -49,7 +62,7 @@ impl TaskMonitor {
       tasks: Arc::new(Mutex::new(HashMap::new())),
       concurrency: Arc::new(Semaphore::new(
         if config.download.transmission.auto_concurrent {
-          std::thread::available_parallelism().unwrap().into()
+          Self::auto_concurrency()
         } else {
           config.download.transmission.concurrent_count
         },
@@ -58,14 +71,26 @@ impl TaskMonitor {
       rx,
       group_map: Arc::new(RwLock::new(HashMap::new())),
       stopped_futures: Arc::new(Mutex::new(Vec::new())),
-      download_rate_limiter: if config.download.transmission.enable_speed_limit {
-        Some(Limiter::new(
-          (config.download.transmission.speed_limit_value as i64 * 1024) as f64,
-        ))
-      } else {
-        None
-      },
+      download_rate_limiter: Mutex::new(None),
     }
+  }
+
+  pub fn download_rate_limiter(&self) -> Option<Limiter> {
+    let config = retrieve_launcher_config(self.app_handle.clone()).ok()?;
+    let enabled = config.download.transmission.enable_speed_limit;
+    let value = config.download.transmission.speed_limit_value;
+    let mut limiter = self.download_rate_limiter.lock().unwrap();
+    if !enabled {
+      *limiter = None;
+      return None;
+    }
+    if limiter
+      .as_ref()
+      .is_none_or(|(_, current_value, _)| *current_value != value)
+    {
+      *limiter = Some((true, value, Limiter::new((value as i64 * 1024) as f64)));
+    }
+    limiter.as_ref().map(|(_, _, limiter)| limiter.clone())
   }
 
   #[allow(clippy::manual_flatten)]
@@ -96,7 +121,7 @@ impl TaskMonitor {
                   false,
                 );
                 let (f, p_handle) = task
-                  .future(self.app_handle.clone(), self.download_rate_limiter.clone())
+                  .future(self.app_handle.clone(), self.download_rate_limiter())
                   .await
                   .unwrap();
                 self.enqueue_task(task_id, task_group, f, p_handle).await;
@@ -139,6 +164,7 @@ impl TaskMonitor {
           GroupMonitor {
             phs: HashMap::from_iter([(id, p_handle.clone())]),
             status: GEventStatus::Started,
+            failed: false,
           },
         );
       }
@@ -205,6 +231,7 @@ impl TaskMonitor {
       GroupMonitor {
         phs: HashMap::from_iter(hvec),
         status: GEventStatus::Started,
+        failed: false,
       },
     );
     GEvent::emit_group_started(&self.app_handle, &task_group);
@@ -304,21 +331,25 @@ impl TaskMonitor {
               {
                 group.phs.remove(&future.task_id);
                 if group.phs.is_empty() {
-                  group.status = GEventStatus::Completed;
-                  GEvent::emit_group_completed(&app, &group_name)
+                  if group.failed {
+                    group.status = GEventStatus::Failed;
+                    GEvent::emit_group_failed(&app, &group_name)
+                  } else {
+                    group.status = GEventStatus::Completed;
+                    GEvent::emit_group_completed(&app, &group_name)
+                  }
                 }
               }
             }
             Err(e) => {
               info!("Task failed: {e:?}");
               if let Some(group_name) = future.task_group {
-                GEvent::emit_group_failed(&app, &group_name);
-                if let Some(group) = group_map.write().unwrap().remove(&group_name) {
-                  for (_, handle) in group.phs {
-                    let mut handle = handle.write().unwrap();
-                    if handle.desc.status.is_waiting() {
-                      handle.mark_cancelled()
-                    }
+                if let Some(group) = group_map.write().unwrap().get_mut(&group_name) {
+                  group.failed = true;
+                  group.phs.remove(&future.task_id);
+                  if group.phs.is_empty() {
+                    group.status = GEventStatus::Failed;
+                    GEvent::emit_group_failed(&app, &group_name);
                   }
                 }
               }
@@ -372,7 +403,7 @@ impl TaskMonitor {
             true,
           );
           let (f, new_h) = task
-            .future(self.app_handle.clone(), self.download_rate_limiter.clone())
+            .future(self.app_handle.clone(), self.download_rate_limiter())
             .await
             .unwrap();
           self.enqueue_task(id, task_group, f, new_h).await;

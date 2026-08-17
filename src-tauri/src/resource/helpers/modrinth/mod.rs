@@ -2,15 +2,14 @@ pub mod misc;
 
 use hex;
 use misc::{
-  ModrinthProject, ModrinthSearchRes, ModrinthVersionPack, get_modrinth_api, make_modrinth_request,
-  map_modrinth_file_to_version_pack,
+  ModrinthProject, ModrinthSearchRes, ModrinthVersionPack, get_modrinth_api,
+  make_modrinth_request_with_app, map_modrinth_file_to_version_pack,
 };
 use sha1::{Digest, Sha1};
 use sjmcl_types::error::SJMCLResult;
 use std::collections::HashMap;
 use std::path::PathBuf;
-use tauri::{AppHandle, Manager};
-use tauri_plugin_http::reqwest;
+use tauri::AppHandle;
 use url::Url;
 
 use crate::instance::models::misc::ModLoaderType;
@@ -71,9 +70,8 @@ pub async fn fetch_resource_list_by_name_modrinth(
   params.insert("limit".to_string(), page_size.to_string());
   params.insert("index".to_string(), sort_by.to_string());
 
-  let client = app.state::<reqwest::Client>();
-  let results = make_modrinth_request::<ModrinthSearchRes, ()>(
-    &client,
+  let results = make_modrinth_request_with_app::<ModrinthSearchRes, ()>(
+    app,
     &url,
     OtherResourceRequestType::GetWithParams(&params),
   )
@@ -103,6 +101,7 @@ pub async fn fetch_resource_version_packs_modrinth(
   let url = get_modrinth_api(OtherResourceApiEndpoint::VersionPack, Some(resource_id))?;
 
   let mut params = HashMap::new();
+  params.insert("include_changelog".to_string(), "false".to_string());
   if mod_loader != ALL_FILTER {
     params.insert(
       "loaders".to_string(),
@@ -124,10 +123,8 @@ pub async fn fetch_resource_version_packs_modrinth(
     params.insert("game_versions".to_string(), versions_json);
   }
 
-  let client = app.state::<reqwest::Client>();
-
-  let results = make_modrinth_request::<Vec<ModrinthVersionPack>, ()>(
-    &client,
+  let results = make_modrinth_request_with_app::<Vec<ModrinthVersionPack>, ()>(
+    app,
     &url,
     OtherResourceRequestType::GetWithParams(&params),
   )
@@ -153,10 +150,8 @@ pub async fn fetch_remote_resource_by_local_modrinth(
   params.insert("algorithm".to_string(), "sha1".to_string());
 
   let url = get_modrinth_api(OtherResourceApiEndpoint::FromLocal, Some(&hash_string))?;
-  let client = app.state::<reqwest::Client>();
-
-  let version_pack = make_modrinth_request::<ModrinthVersionPack, ()>(
-    &client,
+  let version_pack = make_modrinth_request_with_app::<ModrinthVersionPack, ()>(
+    app,
     &url,
     OtherResourceRequestType::GetWithParams(&params),
   )
@@ -187,10 +182,8 @@ pub async fn fetch_remote_resource_by_id_modrinth(
   resource_id: &str,
 ) -> SJMCLResult<OtherResourceInfo> {
   let url = get_modrinth_api(OtherResourceApiEndpoint::ById, Some(resource_id))?;
-  let client = app.state::<reqwest::Client>();
-
   let results =
-    make_modrinth_request::<ModrinthProject, ()>(&client, &url, OtherResourceRequestType::Get)
+    make_modrinth_request_with_app::<ModrinthProject, ()>(app, &url, OtherResourceRequestType::Get)
       .await?;
 
   let mut resource_info: OtherResourceInfo = results.into();

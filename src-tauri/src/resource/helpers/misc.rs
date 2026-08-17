@@ -1,5 +1,6 @@
 use sjmcl_types::error::SJMCLResult;
 use std::cmp::Ordering;
+use std::sync::atomic::{AtomicBool, Ordering as AtomicOrdering};
 use strum::IntoEnumIterator;
 use url::Url;
 
@@ -9,14 +10,49 @@ use crate::resource::models::{
 };
 use crate::utils::string::contains_chinese;
 
+static SOURCE_PREFERENCE_PROBED: AtomicBool = AtomicBool::new(false);
+static PREFER_OFFICIAL_SOURCE: AtomicBool = AtomicBool::new(false);
+
+pub fn set_auto_source_preference(prefer_official: bool) {
+  PREFER_OFFICIAL_SOURCE.store(prefer_official, AtomicOrdering::Relaxed);
+  SOURCE_PREFERENCE_PROBED.store(true, AtomicOrdering::Relaxed);
+}
+
+pub fn get_minecraft_download_mirror(url: &Url) -> Option<Url> {
+  let host = url.host_str()?;
+  let path = url.path();
+  let mirror_path = match host {
+    "piston-data.mojang.com"
+    | "piston-meta.mojang.com"
+    | "launcher.mojang.com"
+    | "launchermeta.mojang.com" => path.to_string(),
+    "resources.download.minecraft.net" => format!("/assets{path}"),
+    "libraries.minecraft.net" => format!("/maven{path}"),
+    _ => return None,
+  };
+
+  let mut mirror = url.clone();
+  mirror.set_host(Some("bmclapi2.bangbang93.com")).ok()?;
+  mirror.set_path(&mirror_path);
+  Some(mirror)
+}
+
 pub fn get_source_priority_list(launcher_config: &LauncherConfig) -> Vec<SourceType> {
   match launcher_config.download.source.strategy.as_str() {
     "official" => vec![SourceType::Official, SourceType::BMCLAPIMirror],
     "mirror" => vec![SourceType::BMCLAPIMirror, SourceType::Official],
-    "auto" => match launcher_config.basic_info.is_china_mainland_ip {
-      true => vec![SourceType::BMCLAPIMirror, SourceType::Official],
-      false => vec![SourceType::Official, SourceType::BMCLAPIMirror],
-    },
+    "auto" => {
+      let prefer_official = if SOURCE_PREFERENCE_PROBED.load(AtomicOrdering::Relaxed) {
+        PREFER_OFFICIAL_SOURCE.load(AtomicOrdering::Relaxed)
+      } else {
+        !launcher_config.basic_info.is_china_mainland_ip
+      };
+      if prefer_official {
+        vec![SourceType::Official, SourceType::BMCLAPIMirror]
+      } else {
+        vec![SourceType::BMCLAPIMirror, SourceType::Official]
+      }
+    }
     _ => vec![SourceType::BMCLAPIMirror, SourceType::Official],
   }
 }
@@ -281,4 +317,34 @@ pub fn sort_localized_search_results(list: &mut Vec<OtherResourceInfo>, search_q
 
   list.extend(translated_results);
   list.extend(untranslated_results);
+}
+
+#[cfg(test)]
+mod tests {
+  use super::get_minecraft_download_mirror;
+  use url::Url;
+
+  #[test]
+  fn maps_mojang_download_hosts_to_bmclapi() {
+    let cases = [
+      (
+        "https://piston-data.mojang.com/v1/objects/abc/client.json",
+        "/v1/objects/abc/client.json",
+      ),
+      (
+        "https://resources.download.minecraft.net/ab/cdef",
+        "/assets/ab/cdef",
+      ),
+      (
+        "https://libraries.minecraft.net/com/example/library.jar",
+        "/maven/com/example/library.jar",
+      ),
+    ];
+
+    for (source, expected_path) in cases {
+      let mirror = get_minecraft_download_mirror(&Url::parse(source).unwrap()).unwrap();
+      assert_eq!(mirror.host_str(), Some("bmclapi2.bangbang93.com"));
+      assert_eq!(mirror.path(), expected_path);
+    }
+  }
 }

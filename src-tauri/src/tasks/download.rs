@@ -1,24 +1,27 @@
 use async_speed_limit::Limiter;
 use futures::StreamExt;
 use futures::stream::TryStreamExt;
+use log::{info, warn};
 use serde::{Deserialize, Serialize};
 use sjmcl_types::error::{SJMCLError, SJMCLResult};
-use std::error::Error;
 use std::future::Future;
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex, OnceLock, RwLock};
 use std::time::{Duration, Instant};
 use tauri::{AppHandle, Manager, Url};
 use tauri_plugin_http::reqwest;
-use tauri_plugin_http::reqwest::header::RANGE;
-use tokio::io::AsyncSeekExt;
+use tauri_plugin_http::reqwest::StatusCode;
+use tauri_plugin_http::reqwest::header::{CONTENT_RANGE, RANGE, USER_AGENT};
+use tokio::io::{AsyncSeekExt, AsyncWriteExt};
 use tokio_util::bytes;
 use tokio_util::compat::FuturesAsyncReadCompatExt;
 
 use crate::launcher_config::commands::retrieve_launcher_config;
 use crate::resource::helpers::curseforge::misc::{
-  CURSEFORGE_API_KEY, is_curseforge_authenticated_url,
+  CURSEFORGE_BROWSER_USER_AGENT, get_curseforge_api_key, get_curseforge_download_mirror,
+  get_modrinth_download_mirror, is_curseforge_authenticated_url,
 };
+use crate::resource::helpers::misc::get_minecraft_download_mirror;
 use crate::tasks::streams::ProgressStream;
 use crate::tasks::streams::desc::{PDesc, PStatus};
 use crate::tasks::streams::reporter::Reporter;
@@ -33,6 +36,9 @@ const GITHUB_MIRRORS: [&str; 4] = [
   "https://gh-proxy.com/",
 ];
 static GITHUB_FASTEST: OnceLock<Mutex<Option<(Instant, String)>>> = OnceLock::new();
+const DOWNLOAD_RETRY_COUNT: usize = 3;
+const PARALLEL_CHUNK_THRESHOLD: i64 = 4 * 1024 * 1024;
+const PARALLEL_CHUNK_COUNT: i64 = 4;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -48,6 +54,7 @@ pub struct DownloadTask {
   param: DownloadParam,
   dest_path: PathBuf,
   report_interval: Duration,
+  allow_parallel_chunks: bool,
 }
 
 impl DownloadTask {
@@ -112,12 +119,41 @@ impl DownloadTask {
     Url::parse(&format!("{mirror}{url}")).unwrap_or_else(|_| url.clone())
   }
 
+  async fn get_download_candidates(
+    app_handle: &AppHandle,
+    url: &Url,
+  ) -> (Vec<Url>, Option<Duration>) {
+    // CurseForge can return mediafilez URLs for files which do not exist on
+    // edge.forgecdn.net. Keep the API-provided URL as the official candidate.
+    let official = url.clone();
+    let Some(mirror) = get_curseforge_download_mirror(&official)
+      .or_else(|| get_modrinth_download_mirror(&official))
+      .or_else(|| get_minecraft_download_mirror(&official))
+    else {
+      return (vec![official], None);
+    };
+    let config = match retrieve_launcher_config(app_handle.clone()) {
+      Ok(config) => config,
+      Err(_) => return (vec![mirror, official], None),
+    };
+
+    match config.download.source.strategy.as_str() {
+      "official" => (vec![official, mirror], None),
+      "mirror" => (vec![mirror, official], None),
+      // Race both routes in automatic mode. The mirror often redirects back to
+      // ForgeCDN, so waiting for it to time out before trying the official URL
+      // can multiply the total retry time.
+      _ => (vec![official, mirror], Some(Duration::from_millis(750))),
+    }
+  }
+
   pub fn new(
     app_handle: AppHandle,
     task_id: u32,
     task_group: Option<String>,
     param: DownloadParam,
     report_interval: Duration,
+    allow_parallel_chunks: bool,
   ) -> Self {
     let cache_dir = retrieve_launcher_config(app_handle.clone())
       .unwrap()
@@ -144,6 +180,7 @@ impl DownloadTask {
       param: param.clone(),
       dest_path: cache_dir.clone().join(param.dest.clone()),
       report_interval,
+      allow_parallel_chunks,
     }
   }
 
@@ -189,6 +226,7 @@ impl DownloadTask {
       param: param.clone(),
       dest_path: cache_dir.clone().join(param.dest.clone()),
       report_interval,
+      allow_parallel_chunks: true,
     }
   }
 
@@ -196,56 +234,281 @@ impl DownloadTask {
     app_handle: &AppHandle,
     current: i64,
     param: &DownloadParam,
+    source_offset: usize,
   ) -> SJMCLResult<reqwest::Response> {
     let state = app_handle.state::<reqwest::Client>();
-    let client = with_retry(state.inner().clone());
+    let client = state.inner().clone();
     let src = Self::resolve_github_url(app_handle, &param.src).await;
-    let mut request = if current == 0 {
-      client.get(src.clone())
-    } else {
-      client
-        .get(src.clone())
-        .header(RANGE, format!("bytes={current}-"))
-    };
-
-    // add api key header for CurseForge download urls (#1679)
-    // ref: https://blog.curseforge.com/introducing-api-key-authentication-for-curseforge-file-downloads
-    if is_curseforge_authenticated_url(&param.src) {
-      request = request.header("x-api-key", CURSEFORGE_API_KEY.as_str());
+    let (mut candidates, hedge_delay) = Self::get_download_candidates(app_handle, &src).await;
+    let candidate_count = candidates.len();
+    if candidate_count > 1 {
+      candidates.rotate_left(source_offset % candidate_count);
     }
 
-    let response = request
-      .send()
+    if let Some(delay) = hedge_delay {
+      let mut requests = futures::stream::FuturesUnordered::new();
+      for (index, src) in candidates.into_iter().enumerate() {
+        let client = client.clone();
+        let api_key = get_curseforge_api_key().map(str::to_owned);
+        let wait = delay * index as u32;
+        requests.push(async move {
+          if !wait.is_zero() {
+            tokio::time::sleep(wait).await;
+          }
+          let mut request = if current == 0 {
+            client.get(src.clone())
+          } else {
+            client
+              .get(src.clone())
+              .header(RANGE, format!("bytes={current}-"))
+          };
+          if is_curseforge_authenticated_url(&src) {
+            request = request.header(USER_AGENT, CURSEFORGE_BROWSER_USER_AGENT);
+            if let Some(key) = api_key.as_deref() {
+              request = request.header("x-api-key", key);
+            }
+          }
+          let response = tokio::time::timeout(Duration::from_secs(30), request.send())
+            .await
+            .map_err(|_| SJMCLError("Download request timed out".into()))?
+            .map_err(|_| SJMCLError("Download request failed".into()))?;
+          response
+            .error_for_status()
+            .map_err(|_| SJMCLError("Download source returned an error status".into()))
+        });
+      }
+      while let Some(result) = requests.next().await {
+        if let Ok(response) = result {
+          info!(
+            "Download source selected (hedged): {} ({})",
+            response.url(),
+            response.status()
+          );
+          return Ok(response);
+        }
+      }
+      return Err(SJMCLError("All download sources failed".into()));
+    }
+
+    let mut last_error = None;
+
+    for src in candidates {
+      let mut request = if current == 0 {
+        client.get(src.clone())
+      } else {
+        client
+          .get(src.clone())
+          .header(RANGE, format!("bytes={current}-"))
+      };
+
+      if is_curseforge_authenticated_url(&src) {
+        request = request.header(USER_AGENT, CURSEFORGE_BROWSER_USER_AGENT);
+        if let Some(key) = get_curseforge_api_key() {
+          request = request.header("x-api-key", key);
+        }
+      }
+
+      match tokio::time::timeout(Duration::from_secs(15), request.send()).await {
+        Ok(Ok(response)) if response.status().is_success() => {
+          info!(
+            "Download source selected: {} ({})",
+            response.url(),
+            response.status()
+          );
+          return Ok(response);
+        }
+        Ok(Ok(response)) => {
+          last_error = Some(format!("{} returned HTTP {}", src, response.status()))
+        }
+        Ok(Err(error)) => last_error = Some(format!("{} failed: {}", src, error)),
+        Err(_) => last_error = Some(format!("{} timed out", src)),
+      }
+    }
+
+    Err(SJMCLError(format!(
+      "All download sources failed: {}",
+      last_error.unwrap_or_else(|| "unknown error".to_string())
+    )))
+  }
+
+  async fn send_range_request(
+    app_handle: &AppHandle,
+    start: i64,
+    end: i64,
+    param: &DownloadParam,
+    source_offset: usize,
+  ) -> SJMCLResult<reqwest::Response> {
+    let state = app_handle.state::<reqwest::Client>();
+    let client = state.inner().clone();
+    let src = Self::resolve_github_url(app_handle, &param.src).await;
+    let (mut candidates, _) = Self::get_download_candidates(app_handle, &src).await;
+    if candidates.len() > 1 {
+      let candidate_count = candidates.len();
+      candidates.rotate_left(source_offset % candidate_count);
+    }
+
+    let mut last_error = None;
+    for src in candidates {
+      let mut request = client
+        .get(src.clone())
+        .header(RANGE, format!("bytes={start}-{end}"));
+      if is_curseforge_authenticated_url(&src) {
+        request = request.header(USER_AGENT, CURSEFORGE_BROWSER_USER_AGENT);
+        if let Some(key) = get_curseforge_api_key() {
+          request = request.header("x-api-key", key);
+        }
+      }
+      match tokio::time::timeout(Duration::from_secs(15), request.send()).await {
+        Ok(Ok(response)) if response.status().is_success() => {
+          info!(
+            "Download range source selected: {} ({}, bytes={}-{})",
+            response.url(),
+            response.status(),
+            start,
+            end
+          );
+          return Ok(response);
+        }
+        Ok(Ok(response)) => last_error = Some(format!("HTTP {}", response.status())),
+        Ok(Err(error)) => last_error = Some(error.to_string()),
+        Err(_) => last_error = Some("request timed out".to_string()),
+      }
+    }
+    Err(SJMCLError(format!(
+      "All range sources failed: {}",
+      last_error.unwrap_or_else(|| "unknown error".to_string())
+    )))
+  }
+
+  async fn probe_range_size(app_handle: &AppHandle, param: &DownloadParam) -> Option<i64> {
+    let response = Self::send_range_request(app_handle, 0, 0, param, 0)
       .await
-      .map_err(|e| SJMCLError(format!("{:?}", e.source())))?;
+      .ok()?;
+    if response.status() != StatusCode::PARTIAL_CONTENT {
+      return None;
+    }
+    response
+      .headers()
+      .get(CONTENT_RANGE)
+      .and_then(|value| value.to_str().ok())
+      .and_then(|value| value.rsplit_once('/'))
+      .and_then(|(_, total)| total.parse::<i64>().ok())
+  }
 
-    let response = response
-      .error_for_status()
-      .map_err(|e| SJMCLError(format!("{:?}", e.source())))?;
+  async fn download_parallel_chunks(
+    app_handle: &AppHandle,
+    param: &DownloadParam,
+    dest_path: &PathBuf,
+    total: i64,
+    task_handle: &Arc<RwLock<PTaskHandle>>,
+  ) -> SJMCLResult<()> {
+    let chunk_size = (total + PARALLEL_CHUNK_COUNT - 1) / PARALLEL_CHUNK_COUNT;
+    task_handle.write().unwrap().set_total(total);
+    let parent = dest_path
+      .parent()
+      .ok_or_else(|| SJMCLError("Download destination has no parent".into()))?;
+    let task_id = task_handle.read().unwrap().desc.task_id;
+    let mut chunks = Vec::new();
+    for index in 0..PARALLEL_CHUNK_COUNT {
+      let start = index * chunk_size;
+      if start >= total {
+        break;
+      }
+      let end = (start + chunk_size - 1).min(total - 1);
+      chunks.push((
+        index,
+        start,
+        end,
+        parent.join(format!(".task-{task_id}.part-{index}")),
+      ));
+    }
 
-    Ok(response)
+    let mut jobs = futures::stream::FuturesUnordered::new();
+    for (_, start, end, part_path) in chunks.iter().cloned() {
+      let app = app_handle.clone();
+      let param = param.clone();
+      let handle = task_handle.clone();
+      jobs.push(async move {
+        // Keep all chunks on the preferred source. Rotating chunks across the
+        // fallback URL can make one failed CDN cancel an otherwise healthy file.
+        let response = Self::send_range_request(&app, start, end, &param, 0).await?;
+        if response.status() != StatusCode::PARTIAL_CONTENT {
+          return Err(SJMCLError(
+            "Download source does not support range requests".into(),
+          ));
+        }
+        let stream = ProgressStream::new_without_completion(
+          response
+            .bytes_stream()
+            .map(|result| result.map_err(std::io::Error::other)),
+          handle,
+        );
+        let mut file = tokio::fs::File::create(&part_path).await?;
+        let received = tokio::io::copy(&mut stream.into_async_read().compat(), &mut file).await?;
+        file.flush().await?;
+        let expected = (end - start + 1) as u64;
+        if received != expected {
+          return Err(SJMCLError(format!(
+            "Incomplete range download: expected {expected} bytes, received {received} bytes"
+          )));
+        }
+        Ok::<(), SJMCLError>(())
+      });
+    }
+
+    let mut failed = None;
+    while let Some(result) = jobs.next().await {
+      if let Err(error) = result {
+        failed = Some(error);
+      }
+    }
+    if let Some(error) = failed {
+      for (_, _, _, part_path) in chunks {
+        let _ = tokio::fs::remove_file(part_path).await;
+      }
+      return Err(error);
+    }
+
+    let mut output = tokio::fs::File::create(dest_path).await?;
+    for (_, _, _, part_path) in chunks {
+      let mut part = tokio::fs::File::open(&part_path).await?;
+      tokio::io::copy(&mut part, &mut output).await?;
+      let _ = tokio::fs::remove_file(part_path).await;
+    }
+    output.sync_data().await?;
+    Ok(())
   }
 
   async fn create_resp_stream(
     app_handle: &AppHandle,
     current: i64,
     param: &DownloadParam,
+    source_offset: usize,
   ) -> SJMCLResult<(
     impl Stream<Item = Result<bytes::Bytes, std::io::Error>> + Send + use<>,
     i64,
+    bool,
   )> {
-    let resp = Self::send_request(app_handle, current, param).await?;
-    let total_progress = if current == 0 {
-      resp.content_length().map_or(-1, |length| length as i64)
-    } else {
-      -1
-    };
+    let resp = Self::send_request(app_handle, current, param, source_offset).await?;
+    let can_resume = current == 0 || resp.status() == StatusCode::PARTIAL_CONTENT;
+    let total_progress = resp
+      .headers()
+      .get(CONTENT_RANGE)
+      .and_then(|value| value.to_str().ok())
+      .and_then(|value| value.rsplit_once('/'))
+      .and_then(|(_, total)| total.parse::<i64>().ok())
+      .or_else(|| {
+        resp
+          .content_length()
+          .map(|length| length as i64 + if can_resume { current } else { 0 })
+      })
+      .unwrap_or(-1);
     Ok((
-      resp.bytes_stream().map(|res| match res {
-        Ok(bytes) => Ok(bytes),
-        Err(_) => Ok(bytes::Bytes::new()),
-      }),
+      resp
+        .bytes_stream()
+        .map(|res| res.map_err(std::io::Error::other)),
       total_progress,
+      can_resume,
     ))
   }
 
@@ -257,39 +520,126 @@ impl DownloadTask {
     impl Future<Output = SJMCLResult<()>> + Send,
     Arc<RwLock<PTaskHandle>>,
   )> {
-    let current = self.p_handle.desc.current;
     let handle = Arc::new(RwLock::new(self.p_handle));
     let task_handle = handle.clone();
     let param = self.param.clone();
     Ok((
       async move {
-        let (resp, total_progress) = Self::create_resp_stream(&app_handle, current, &param).await?;
-        let stream = ProgressStream::new(resp, task_handle.clone());
         tokio::fs::create_dir_all(&self.dest_path.parent().unwrap()).await?;
-        let mut file = if current == 0 {
-          tokio::fs::File::create(&self.dest_path).await?
-        } else {
-          let mut f = tokio::fs::OpenOptions::new().open(&self.dest_path).await?;
-          f.seek(std::io::SeekFrom::Start(current as u64)).await?;
-          f
-        };
+
+        if self.allow_parallel_chunks
+          && task_handle.read().unwrap().desc.current == 0
+          && let Some(total) = Self::probe_range_size(&app_handle, &param).await
+          && total >= PARALLEL_CHUNK_THRESHOLD
         {
-          let mut task_handle = task_handle.write().unwrap();
-          task_handle.set_total(total_progress);
-          task_handle.mark_started();
+          match Self::download_parallel_chunks(
+            &app_handle,
+            &param,
+            &self.dest_path,
+            total,
+            &task_handle,
+          )
+          .await
+          {
+            Ok(()) => {
+              if let Some(truth) = param.sha1.clone() {
+                validate_sha1(self.dest_path.clone(), truth)?;
+              }
+              task_handle.write().unwrap().mark_completed();
+              return Ok(());
+            }
+            Err(error) => {
+              warn!(
+                "Parallel download failed, falling back to resumable download: {:?}",
+                error
+              );
+              task_handle.write().unwrap().reset_progress();
+              let _ = tokio::fs::remove_file(&self.dest_path).await;
+            }
+          }
         }
-        if let Some(lim) = limiter {
-          tokio::io::copy(&mut lim.limit(stream.into_async_read()).compat(), &mut file).await?;
-        } else {
-          tokio::io::copy(&mut stream.into_async_read().compat(), &mut file).await?;
+
+        let mut last_error = None;
+        for attempt in 0..=DOWNLOAD_RETRY_COUNT {
+          let current = task_handle.read().unwrap().desc.current;
+          let response = Self::create_resp_stream(&app_handle, current, &param, attempt).await;
+          let (resp, total_progress, can_resume) = match response {
+            Ok(response) => response,
+            Err(error) => {
+              last_error = Some(error);
+              if attempt < DOWNLOAD_RETRY_COUNT {
+                tokio::time::sleep(Duration::from_millis(300 * (attempt + 1) as u64)).await;
+                continue;
+              }
+              break;
+            }
+          };
+
+          let current = if can_resume {
+            current
+          } else {
+            task_handle.write().unwrap().reset_progress();
+            0
+          };
+          if task_handle.read().unwrap().status().is_cancelled() {
+            if tokio::fs::try_exists(&self.dest_path).await? {
+              tokio::fs::remove_file(&self.dest_path).await?;
+            }
+            return Ok(());
+          }
+          {
+            let mut handle = task_handle.write().unwrap();
+            handle.set_total(total_progress);
+            if !handle.status().is_in_progress() {
+              handle.mark_started();
+            }
+          }
+          let stream = ProgressStream::new(resp, task_handle.clone());
+          let mut file = if current == 0 {
+            tokio::fs::File::create(&self.dest_path).await?
+          } else {
+            let mut file = tokio::fs::OpenOptions::new()
+              .write(true)
+              .open(&self.dest_path)
+              .await?;
+            file.seek(std::io::SeekFrom::Start(current as u64)).await?;
+            file
+          };
+          let result = if let Some(lim) = limiter.clone() {
+            tokio::io::copy(&mut lim.limit(stream.into_async_read()).compat(), &mut file).await
+          } else {
+            tokio::io::copy(&mut stream.into_async_read().compat(), &mut file).await
+          };
+          file.sync_data().await?;
+
+          match result {
+            Ok(_) => {
+              last_error = None;
+              break;
+            }
+            Err(error) => {
+              last_error = Some(error.into());
+              if attempt < DOWNLOAD_RETRY_COUNT {
+                tokio::time::sleep(Duration::from_millis(300 * (attempt + 1) as u64)).await;
+              }
+            }
+          }
         }
-        drop(file);
+        if let Some(error) = last_error {
+          return Err(error);
+        }
         if task_handle.read().unwrap().status().is_cancelled() {
           tokio::fs::remove_file(&self.dest_path).await?;
           Ok(())
         } else {
           match param.sha1 {
-            Some(truth) => validate_sha1(param.dest, truth),
+            Some(truth) => match validate_sha1(self.dest_path.clone(), truth) {
+              Ok(()) => Ok(()),
+              Err(error) => {
+                let _ = tokio::fs::remove_file(&self.dest_path).await;
+                Err(error)
+              }
+            },
             None => Ok(()),
           }
         }

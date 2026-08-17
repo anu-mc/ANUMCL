@@ -63,7 +63,7 @@ use crate::launch::models::LaunchError;
 use crate::launcher_config::helpers::java::build_mojang_java_download_params;
 use crate::launcher_config::helpers::misc::get_global_game_config;
 use crate::launcher_config::models::{GameConfig, GameDirectory, LauncherConfig};
-use crate::resource::helpers::misc::get_source_priority_list;
+use crate::resource::helpers::misc::{get_minecraft_download_mirror, get_source_priority_list};
 use crate::resource::helpers::translation::{
   LOCAL_MOD_TRANSLATION_CACHE_EXPIRY_HOURS, LocalModTranslationEntry, LocalModTranslationsCache,
   add_local_mod_translations,
@@ -1106,14 +1106,43 @@ pub async fn create_instance(
   };
 
   // Download version info
-  let mut version_info = client
-    .get(&game.url)
-    .send()
+  let version_url = Url::parse(&game.url).map_err(|_| InstanceError::ClientJsonParseError)?;
+  let version_urls = match launcher_config_state
+    .lock()?
+    .download
+    .source
+    .strategy
+    .as_str()
+  {
+    "official" => vec![
+      Some(version_url.clone()),
+      get_minecraft_download_mirror(&version_url),
+    ],
+    _ => vec![
+      get_minecraft_download_mirror(&version_url),
+      Some(version_url.clone()),
+    ],
+  };
+  let mut version_info = None;
+  for url in version_urls.into_iter().flatten() {
+    let response = match tokio::time::timeout(
+      std::time::Duration::from_secs(20),
+      client.get(url).send(),
+    )
     .await
-    .map_err(|_| InstanceError::NetworkError)?
-    .json::<McClientInfo>()
-    .await
-    .map_err(|_| InstanceError::ClientJsonParseError)?;
+    {
+      Ok(Ok(response)) if response.status().is_success() => response,
+      _ => continue,
+    };
+    version_info = Some(
+      response
+        .json::<McClientInfo>()
+        .await
+        .map_err(|_| InstanceError::ClientJsonParseError)?,
+    );
+    break;
+  }
+  let mut version_info = version_info.ok_or(InstanceError::NetworkError)?;
 
   version_info.id = name.clone();
   version_info.jar = Some(name.clone());

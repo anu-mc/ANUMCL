@@ -14,8 +14,40 @@ use url::Url;
 
 use crate::launcher_config::models::{LauncherConfig, ProxyType};
 
+#[cfg(target_os = "windows")]
+fn get_windows_system_http_proxy() -> Option<String> {
+  use winreg::RegKey;
+  use winreg::enums::HKEY_CURRENT_USER;
+
+  let key = RegKey::predef(HKEY_CURRENT_USER)
+    .open_subkey("Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings")
+    .ok()?;
+  let enabled: u32 = key.get_value("ProxyEnable").ok()?;
+  if enabled == 0 {
+    return None;
+  }
+  let server: String = key.get_value("ProxyServer").ok()?;
+  let address = server
+    .split(';')
+    .find_map(|entry| entry.strip_prefix("http="))
+    .or_else(|| (!server.contains('=')).then_some(server.as_str()))?
+    .trim();
+  if address.is_empty() {
+    None
+  } else if address.starts_with("http://") {
+    Some(address.to_string())
+  } else {
+    Some(format!("http://{address}"))
+  }
+}
+
+#[cfg(not(target_os = "windows"))]
+fn get_windows_system_http_proxy() -> Option<String> {
+  None
+}
+
 /// Builds a reqwest client with AHNUMCL User-Agent and proxy support.
-/// Defaults to 10s timeout.
+/// Defaults to a 10s connection timeout and a 60s read timeout.
 ///
 /// # Arguments
 ///
@@ -36,8 +68,9 @@ use crate::launcher_config::models::{LauncherConfig, ProxyType};
 /// ```
 pub fn build_sjmcl_client(app: &AppHandle, use_proxy: bool) -> Client {
   let mut builder = ClientBuilder::new()
-    .timeout(Duration::from_secs(10))
-    .tcp_keepalive(Duration::from_secs(10));
+    .connect_timeout(Duration::from_secs(10))
+    .read_timeout(Duration::from_secs(60))
+    .tcp_keepalive(Duration::from_secs(30));
 
   if let Ok(config) = app.state::<Mutex<LauncherConfig>>().lock() {
     // According to the User-Agent requirements of mozilla and BMCLAPI, the User-Agent is set to start with ${NAME}/${VERSION}
@@ -49,14 +82,20 @@ pub fn build_sjmcl_client(app: &AppHandle, use_proxy: bool) -> Client {
       builder = builder.default_headers(headers);
     }
 
-    if use_proxy && config.download.proxy.enabled {
-      let proxy_cfg = &config.download.proxy;
-      let proxy_url = match proxy_cfg.selected_type {
-        ProxyType::Http => format!("http://{}:{}", proxy_cfg.host, proxy_cfg.port),
-        ProxyType::Socks => format!("socks5h://{}:{}", proxy_cfg.host, proxy_cfg.port),
+    if use_proxy {
+      let proxy_url = if config.download.proxy.enabled {
+        let proxy_cfg = &config.download.proxy;
+        match proxy_cfg.selected_type {
+          ProxyType::Http => Some(format!("http://{}:{}", proxy_cfg.host, proxy_cfg.port)),
+          ProxyType::Socks => Some(format!("socks5h://{}:{}", proxy_cfg.host, proxy_cfg.port)),
+        }
+      } else {
+        get_windows_system_http_proxy()
       };
 
-      if let Ok(proxy) = Proxy::all(&proxy_url) {
+      if let Some(proxy_url) = proxy_url
+        && let Ok(proxy) = Proxy::all(&proxy_url)
+      {
         builder = builder.proxy(proxy);
       }
     }

@@ -1,8 +1,13 @@
 use serde::Deserialize;
 use sjmcl_types::error::{SJMCLError, SJMCLResult};
+use std::future::Future;
+use std::pin::Pin;
+use std::time::Duration;
 use tauri::{AppHandle, Manager};
 use tauri_plugin_http::reqwest;
 
+use crate::launcher_config::commands::retrieve_launcher_config;
+use crate::resource::helpers::curseforge::misc::CURSEFORGE_BROWSER_USER_AGENT;
 use crate::resource::helpers::misc::version_pack_sort;
 use crate::resource::models::{
   OtherResourceApiEndpoint, OtherResourceDependency, OtherResourceFileInfo, OtherResourceInfo,
@@ -10,34 +15,153 @@ use crate::resource::models::{
   ResourceError,
 };
 
-pub async fn make_modrinth_request<T, P>(
-  client: &reqwest::Client,
+pub async fn make_modrinth_request_with_app<T, P>(
+  app: &AppHandle,
   url: &str,
   request_type: OtherResourceRequestType<'_, P>,
+) -> SJMCLResult<T>
+where
+  T: serde::de::DeserializeOwned + Send,
+  P: serde::Serialize + Sync,
+{
+  let client = app.state::<reqwest::Client>();
+  let mirror = url.replacen(
+    "https://api.modrinth.com",
+    "https://mod.mcimirror.top/modrinth",
+    1,
+  );
+  let strategy = retrieve_launcher_config(app.clone())
+    .map(|config| config.download.source.strategy)
+    .unwrap_or_else(|_| "auto".to_string());
+  if strategy == "auto" && mirror != url {
+    if let Ok(value) = race_modrinth_requests(
+      client.inner(),
+      url,
+      &mirror,
+      Duration::from_secs(5),
+      &request_type,
+    )
+    .await
+    {
+      return Ok(value);
+    }
+    return race_modrinth_requests(
+      client.inner(),
+      url,
+      &mirror,
+      Duration::from_secs(10),
+      &request_type,
+    )
+    .await;
+  }
+  let candidates = match strategy.as_str() {
+    "mirror" => vec![(mirror.clone(), 5), (mirror, 10), (url.to_string(), 15)],
+    "official" => vec![(url.to_string(), 5), (url.to_string(), 15), (mirror, 10)],
+    _ => vec![
+      (url.to_string(), 5),
+      (mirror.clone(), 5),
+      (url.to_string(), 15),
+      (mirror, 10),
+    ],
+  };
+
+  for (candidate, seconds) in candidates {
+    let request = match &request_type {
+      OtherResourceRequestType::GetWithParams(params) => client.get(&candidate).query(params),
+      OtherResourceRequestType::Get => client.get(&candidate),
+      OtherResourceRequestType::Post(payload) => client.post(&candidate).json(payload),
+    }
+    .header("User-Agent", CURSEFORGE_BROWSER_USER_AGENT);
+    let result = tokio::time::timeout(Duration::from_secs(seconds), async {
+      let response = request
+        .send()
+        .await
+        .map_err(|_| ResourceError::NetworkError)?;
+      if !response.status().is_success() {
+        return Err::<T, SJMCLError>(ResourceError::NetworkError.into());
+      }
+      response
+        .json::<T>()
+        .await
+        .map_err(|_| ResourceError::ParseError.into())
+    })
+    .await;
+    if let Ok(Ok(value)) = result {
+      return Ok(value);
+    }
+  }
+
+  Err(ResourceError::NetworkError.into())
+}
+
+async fn race_modrinth_requests<T, P>(
+  client: &reqwest::Client,
+  official: &str,
+  mirror: &str,
+  timeout: Duration,
+  request_type: &OtherResourceRequestType<'_, P>,
+) -> SJMCLResult<T>
+where
+  T: serde::de::DeserializeOwned + Send,
+  P: serde::Serialize + Sync,
+{
+  let mut pending: Vec<Pin<Box<dyn Future<Output = SJMCLResult<T>> + Send + '_>>> = vec![
+    Box::pin(send_modrinth_request(
+      client,
+      official,
+      timeout,
+      request_type,
+    )),
+    Box::pin(async {
+      tokio::time::sleep(Duration::from_millis(350)).await;
+      send_modrinth_request(client, mirror, timeout, request_type).await
+    }),
+  ];
+  let mut last_error = None;
+
+  while !pending.is_empty() {
+    let (result, _, remaining) = futures::future::select_all(pending).await;
+    pending = remaining;
+    match result {
+      Ok(value) => return Ok(value),
+      Err(error) => last_error = Some(error),
+    }
+  }
+
+  Err(last_error.unwrap_or_else(|| ResourceError::NetworkError.into()))
+}
+
+async fn send_modrinth_request<T, P>(
+  client: &reqwest::Client,
+  url: &str,
+  timeout: Duration,
+  request_type: &OtherResourceRequestType<'_, P>,
 ) -> SJMCLResult<T>
 where
   T: serde::de::DeserializeOwned,
   P: serde::Serialize,
 {
-  let request_builder = match request_type {
+  let request = match request_type {
     OtherResourceRequestType::GetWithParams(params) => client.get(url).query(params),
     OtherResourceRequestType::Get => client.get(url),
     OtherResourceRequestType::Post(payload) => client.post(url).json(payload),
-  };
-
-  let response = request_builder
-    .send()
-    .await
-    .map_err(|_| ResourceError::NetworkError)?;
-
-  if !response.status().is_success() {
-    return Err(ResourceError::NetworkError.into());
   }
-
-  response
-    .json::<T>()
-    .await
-    .map_err(|_| ResourceError::ParseError.into())
+  .header("User-Agent", CURSEFORGE_BROWSER_USER_AGENT);
+  tokio::time::timeout(timeout, async {
+    let response = request
+      .send()
+      .await
+      .map_err(|_| ResourceError::NetworkError)?;
+    if !response.status().is_success() {
+      return Err(ResourceError::NetworkError.into());
+    }
+    response
+      .json::<T>()
+      .await
+      .map_err(|_| ResourceError::ParseError.into())
+  })
+  .await
+  .map_err(|_| ResourceError::NetworkError)?
 }
 
 pub fn get_modrinth_api(
@@ -298,7 +422,7 @@ pub async fn translate_description_modrinth(
   app: &AppHandle,
   resource_id: &str,
 ) -> SJMCLResult<Option<String>> {
-  let result = async {
+  let result = tokio::time::timeout(Duration::from_secs(3), async {
     let url = get_modrinth_api(OtherResourceApiEndpoint::TranslateDesc, Some(resource_id))?;
     let client = app.state::<reqwest::Client>();
 
@@ -310,9 +434,9 @@ pub async fn translate_description_modrinth(
       .await?;
 
     Ok::<_, SJMCLError>(translation_res.translated)
-  }
+  })
   .await;
 
   // Only return Ok(None) when translation fails, to avoid blocking major functionality
-  Ok(result.ok())
+  Ok(result.ok().and_then(Result::ok))
 }

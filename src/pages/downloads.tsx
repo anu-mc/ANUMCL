@@ -275,6 +275,10 @@ export const DownloadTasksPage = () => {
                     size="xs"
                     value={group.progress}
                     colorScheme={primaryColor}
+                    isIndeterminate={
+                      group.status === GTaskEventStatusEnums.Started &&
+                      group.taskDescs.every((task) => !task.total)
+                    }
                     borderRadius="sm"
                     mb={1}
                   />
@@ -306,7 +310,9 @@ export const DownloadTasksPage = () => {
                             value={task.progress}
                             colorScheme={primaryColor}
                             isIndeterminate={
-                              task.status === TaskDescStatusEnums.Waiting
+                              task.status === TaskDescStatusEnums.Waiting ||
+                              (task.status === TaskDescStatusEnums.InProgress &&
+                                !task.total)
                             }
                             borderRadius="sm"
                           />

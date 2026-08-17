@@ -3,9 +3,14 @@ use serde::{Deserialize, Serialize};
 use sjmcl_types::error::{SJMCLError, SJMCLResult};
 use std::collections::HashMap;
 use std::env;
+use std::future::Future;
+use std::pin::Pin;
+use std::time::Duration;
 use tauri::{AppHandle, Manager};
 use tauri_plugin_http::reqwest;
+use tauri_plugin_http::reqwest::header::USER_AGENT;
 
+use crate::launcher_config::commands::retrieve_launcher_config;
 use crate::resource::helpers::misc::version_pack_sort;
 use crate::resource::models::{
   OtherResourceApiEndpoint, OtherResourceDependency, OtherResourceFileInfo, OtherResourceInfo,
@@ -20,42 +25,277 @@ lazy_static! {
   };
 }
 
+pub const CURSEFORGE_BROWSER_USER_AGENT: &str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36";
+
+pub fn get_curseforge_api_key() -> Option<&'static str> {
+  let key = CURSEFORGE_API_KEY.trim();
+  // The official CurseForge key format may contain '$'; only an empty value is
+  // invalid. The mirror endpoint does not require this header.
+  if key.is_empty() { None } else { Some(key) }
+}
+
 pub fn is_curseforge_authenticated_url(url: &url::Url) -> bool {
-  matches!(
-    url.host_str(),
-    Some("api.curseforge.com" | "edge.forgecdn.net" | "mediafilez.forgecdn.net")
-  )
+  url.host_str().is_some_and(|host| {
+    host == "api.curseforge.com" || host == "forgecdn.net" || host.ends_with(".forgecdn.net")
+  })
+}
+
+pub fn normalize_curseforge_download_url(url: &url::Url) -> url::Url {
+  let Some(host) = url.host_str() else {
+    return url.clone();
+  };
+  let normalized_host = match host.strip_suffix("-service.overwolf.wtf") {
+    Some("media" | "mediafilez") => "mediafilez.forgecdn.net".to_string(),
+    Some(prefix) => format!("{prefix}.forgecdn.net"),
+    None => return url.clone(),
+  };
+
+  let mut normalized = url.clone();
+  if normalized.set_host(Some(&normalized_host)).is_err() {
+    return url.clone();
+  }
+  normalized
+}
+
+pub fn get_curseforge_download_mirror(url: &url::Url) -> Option<url::Url> {
+  let normalized = normalize_curseforge_download_url(url);
+  if !normalized
+    .host_str()
+    .is_some_and(|host| host == "forgecdn.net" || host.ends_with(".forgecdn.net"))
+  {
+    return None;
+  }
+
+  let mut mirror = normalized;
+  mirror.set_host(Some("mod.mcimirror.top")).ok()?;
+  Some(mirror)
+}
+
+pub fn get_modrinth_download_mirror(url: &url::Url) -> Option<url::Url> {
+  if url.host_str() != Some("cdn.modrinth.com") {
+    return None;
+  }
+  let mut mirror = url.clone();
+  mirror.set_host(Some("mod.mcimirror.top")).ok()?;
+  Some(mirror)
+}
+
+#[cfg(test)]
+mod tests {
+  use super::{
+    get_curseforge_download_mirror, get_modrinth_download_mirror, is_curseforge_authenticated_url,
+    normalize_curseforge_download_url,
+  };
+  use url::Url;
+
+  #[test]
+  fn normalizes_curseforge_cdn_hosts() {
+    for host in ["mediafilez-service.overwolf.wtf"] {
+      let url = Url::parse(&format!("https://{host}/files/1/2/example%20mod.jar")).unwrap();
+      let normalized = normalize_curseforge_download_url(&url);
+      assert_eq!(normalized.host_str(), Some("mediafilez.forgecdn.net"));
+      assert_eq!(normalized.path(), "/files/1/2/example%20mod.jar");
+      assert!(is_curseforge_authenticated_url(&normalized));
+    }
+  }
+
+  #[test]
+  fn leaves_unrelated_hosts_unchanged_and_unsigned() {
+    let url = Url::parse("https://example.com/file.jar").unwrap();
+    assert_eq!(normalize_curseforge_download_url(&url), url);
+    assert!(!is_curseforge_authenticated_url(&url));
+  }
+
+  #[test]
+  fn maps_forgecdn_downloads_to_the_mirror() {
+    let url = Url::parse("https://mediafilez.forgecdn.net/files/1/2/example%20mod.jar").unwrap();
+    let mirror = get_curseforge_download_mirror(&url).unwrap();
+    assert_eq!(mirror.host_str(), Some("mod.mcimirror.top"));
+    assert_eq!(mirror.path(), "/files/1/2/example%20mod.jar");
+  }
+
+  #[test]
+  fn maps_modrinth_downloads_to_the_mirror() {
+    let url = Url::parse("https://cdn.modrinth.com/data/abc/versions/def/mod.jar").unwrap();
+    let mirror = get_modrinth_download_mirror(&url).unwrap();
+    assert_eq!(mirror.host_str(), Some("mod.mcimirror.top"));
+    assert_eq!(mirror.path(), "/data/abc/versions/def/mod.jar");
+  }
 }
 
 pub async fn make_curseforge_request<T, P>(
-  client: &reqwest::Client,
+  app: &AppHandle,
   url: &str,
   request_type: OtherResourceRequestType<'_, P>,
+) -> SJMCLResult<T>
+where
+  T: serde::de::DeserializeOwned + Send,
+  P: serde::Serialize + Sync,
+{
+  let client = app.state::<reqwest::Client>();
+  let strategy = retrieve_launcher_config(app.clone())
+    .map(|config| config.download.source.strategy)
+    .unwrap_or_else(|_| "auto".to_string());
+  let mirror = url.replacen(
+    "https://api.curseforge.com",
+    "https://mod.mcimirror.top/curseforge",
+    1,
+  );
+  if strategy == "auto" && mirror != url {
+    // The two routes have highly variable latency. Race them instead of
+    // waiting for a half-open route to exhaust a serial timeout.
+    if let Ok(value) = race_curseforge_requests(
+      client.inner(),
+      url,
+      &mirror,
+      Duration::from_secs(5),
+      &request_type,
+    )
+    .await
+    {
+      return Ok(value);
+    }
+    return race_curseforge_requests(
+      client.inner(),
+      url,
+      &mirror,
+      Duration::from_secs(10),
+      &request_type,
+    )
+    .await;
+  }
+  let candidates = get_curseforge_api_candidates(app, url);
+
+  let mut last_error = None;
+  for (url, timeout) in candidates {
+    match send_curseforge_request(client.inner(), &url, timeout, &request_type).await {
+      Ok(value) => return Ok(value),
+      Err(error) => last_error = Some(error),
+    }
+  }
+
+  Err(last_error.unwrap_or_else(|| ResourceError::NetworkError.into()))
+}
+
+async fn race_curseforge_requests<T, P>(
+  client: &reqwest::Client,
+  official: &str,
+  mirror: &str,
+  timeout: Duration,
+  request_type: &OtherResourceRequestType<'_, P>,
+) -> SJMCLResult<T>
+where
+  T: serde::de::DeserializeOwned + Send,
+  P: serde::Serialize + Sync,
+{
+  let mut pending: Vec<Pin<Box<dyn Future<Output = SJMCLResult<T>> + Send + '_>>> = vec![
+    Box::pin(send_curseforge_request(
+      client,
+      official,
+      timeout,
+      request_type,
+    )),
+    Box::pin(async {
+      tokio::time::sleep(Duration::from_millis(350)).await;
+      send_curseforge_request(client, mirror, timeout, request_type).await
+    }),
+  ];
+  let mut last_error = None;
+
+  while !pending.is_empty() {
+    let (result, _, remaining) = futures::future::select_all(pending).await;
+    pending = remaining;
+    match result {
+      Ok(value) => return Ok(value),
+      Err(error) => last_error = Some(error),
+    }
+  }
+
+  Err(last_error.unwrap_or_else(|| ResourceError::NetworkError.into()))
+}
+
+async fn send_curseforge_request<T, P>(
+  client: &reqwest::Client,
+  url: &str,
+  timeout: Duration,
+  request_type: &OtherResourceRequestType<'_, P>,
 ) -> SJMCLResult<T>
 where
   T: serde::de::DeserializeOwned,
   P: serde::Serialize,
 {
-  let request_builder = match request_type {
+  let mut request_builder = match request_type {
     OtherResourceRequestType::GetWithParams(params) => client.get(url).query(params),
     OtherResourceRequestType::Get => client.get(url),
     OtherResourceRequestType::Post(payload) => client.post(url).json(payload),
   };
-
-  let response = request_builder
-    .header("x-api-key", CURSEFORGE_API_KEY.as_str())
-    .send()
-    .await
-    .map_err(|_| ResourceError::NetworkError)?;
-
-  if !response.status().is_success() {
-    return Err(ResourceError::NetworkError.into());
+  // CurseForge and mcimirror both expect a browser-like UA. The API key is
+  // restricted to the official host and must not be forwarded to the mirror.
+  request_builder = request_builder.header(USER_AGENT, CURSEFORGE_BROWSER_USER_AGENT);
+  if url::Url::parse(url)
+    .ok()
+    .is_some_and(|parsed| is_curseforge_authenticated_url(&parsed))
+    && let Some(key) = get_curseforge_api_key()
+  {
+    request_builder = request_builder.header("x-api-key", key);
   }
 
-  response
-    .json::<T>()
-    .await
-    .map_err(|_| ResourceError::ParseError.into())
+  tokio::time::timeout(timeout, async {
+    let response = request_builder.send().await.map_err(|error| {
+      log::warn!("CurseForge request failed for {}: {}", url, error);
+      ResourceError::NetworkError
+    })?;
+    if !response.status().is_success() {
+      log::warn!(
+        "CurseForge request returned {} for {}",
+        response.status(),
+        url
+      );
+      return Err(ResourceError::NetworkError.into());
+    }
+    response.json::<T>().await.map_err(|error| {
+      log::warn!("CurseForge response parse failed for {}: {}", url, error);
+      ResourceError::ParseError.into()
+    })
+  })
+  .await
+  .map_err(|_| ResourceError::NetworkError)?
+}
+
+fn get_curseforge_api_candidates(app: &AppHandle, url: &str) -> Vec<(String, Duration)> {
+  let seconds = |value| Duration::from_secs(value);
+  let mirror = url.replacen(
+    "https://api.curseforge.com",
+    "https://mod.mcimirror.top/curseforge",
+    1,
+  );
+  if mirror == url {
+    return vec![(url.to_string(), seconds(15))];
+  }
+
+  let strategy = retrieve_launcher_config(app.clone())
+    .map(|config| config.download.source.strategy)
+    .unwrap_or_else(|_| "auto".to_string());
+  let mirror_first =
+    strategy == "mirror" || (strategy == "auto" && get_curseforge_api_key().is_none());
+  match (strategy.as_str(), mirror_first) {
+    ("mirror", _) | ("auto", true) => vec![
+      (mirror.clone(), seconds(5)),
+      (mirror, seconds(10)),
+      (url.to_string(), seconds(15)),
+    ],
+    ("official", _) => vec![
+      (url.to_string(), seconds(5)),
+      (url.to_string(), seconds(15)),
+      (mirror, seconds(10)),
+    ],
+    _ => vec![
+      (url.to_string(), seconds(5)),
+      (mirror.clone(), seconds(5)),
+      (url.to_string(), seconds(15)),
+      (mirror, seconds(10)),
+    ],
+  }
 }
 
 pub fn get_curseforge_api(
@@ -512,22 +752,21 @@ pub async fn translate_description_curseforge(
   app: &AppHandle,
   resource_id: &str,
 ) -> SJMCLResult<Option<String>> {
-  let result = async {
+  let result = tokio::time::timeout(Duration::from_secs(3), async {
     let url = get_curseforge_api(OtherResourceApiEndpoint::TranslateDesc, Some(resource_id))?;
     let client = app.state::<reqwest::Client>();
 
     let translation_res = client
       .get(&url)
-      .header("x-api-key", CURSEFORGE_API_KEY.as_str())
       .send()
       .await?
       .json::<CurseForgeTranslationRes>()
       .await?;
 
     Ok::<_, SJMCLError>(translation_res.translated)
-  }
+  })
   .await;
 
   // Only return Ok(None) when translation fails, to avoid blocking major functionality
-  Ok(result.ok())
+  Ok(result.ok().and_then(Result::ok))
 }
