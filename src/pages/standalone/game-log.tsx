@@ -5,16 +5,22 @@ import {
   Flex,
   IconButton,
   Input,
-  Spacer,
   Tooltip,
   useColorModeValue,
 } from "@chakra-ui/react";
 import { appLogDir, join } from "@tauri-apps/api/path";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { revealItemInDir } from "@tauri-apps/plugin-opener";
+import { useRouter } from "next/router";
 import { MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { LuChevronsDown, LuFileInput, LuTrash } from "react-icons/lu";
+import {
+  LuArrowLeft,
+  LuChevronsDown,
+  LuCopy,
+  LuFileInput,
+  LuTrash,
+} from "react-icons/lu";
 import {
   AutoSizer,
   CellMeasurer,
@@ -25,8 +31,12 @@ import {
 import "react-virtualized/styles.css";
 import Empty from "@/components/common/empty";
 import { useLauncherConfig } from "@/contexts/config";
+import { useToast } from "@/contexts/toast";
+import { InstanceSubdirType } from "@/enums/instance";
+import { InstanceService } from "@/services/instance";
 import { LaunchService } from "@/services/launch";
 import styles from "@/styles/game-log.module.css";
+import { copyText } from "@/utils/copy";
 import { clamp } from "@/utils/math";
 import { parseIdFromWindowLabel } from "@/utils/window";
 
@@ -38,7 +48,9 @@ type LogSelectionState = {
 };
 
 const GameLogPage: React.FC = () => {
+  const router = useRouter();
   const { t } = useTranslation();
+  const toast = useToast();
   const { config } = useLauncherConfig();
   const primaryColor = config.appearance.theme.primaryColor;
   const logFontFamily = config.appearance.font.logFontFamily;
@@ -53,6 +65,11 @@ const GameLogPage: React.FC = () => {
     DEBUG: true,
   });
   const [isScrolledToBottom, setIsScrolledToBottom] = useState(true);
+  const instanceId =
+    router.pathname.endsWith("/settings/logs") &&
+    typeof router.query.id === "string"
+      ? router.query.id
+      : null;
 
   const launchingIdRef = useRef<number | null>(null);
   const listRef = useRef<List>(null);
@@ -72,6 +89,19 @@ const GameLogPage: React.FC = () => {
 
   useEffect(() => {
     (async () => {
+      if (!router.isReady) return;
+      if (instanceId) {
+        const res = await InstanceService.readInstanceFile(
+          instanceId,
+          InstanceSubdirType.Root,
+          "logs/latest.log"
+        );
+        if (res.status === "success") {
+          setLogs(res.data.split(/\r?\n/));
+        }
+        return;
+      }
+
       launchingIdRef.current = parseIdFromWindowLabel(
         getCurrentWebviewWindow().label
       );
@@ -83,16 +113,17 @@ const GameLogPage: React.FC = () => {
         setLogs(res.data);
       }
     })();
-  }, []);
+  }, [instanceId, router.isReady]);
 
   // ------- Live log stream and auto scroll -------
 
   useEffect(() => {
+    if (instanceId) return;
     const unlisten = LaunchService.onGameProcessOutput((payload) => {
       setLogs((prevLogs) => [...prevLogs, payload]);
     });
     return () => unlisten();
-  }, []);
+  }, [instanceId]);
 
   useEffect(() => {
     if (userScrolledRef.current) return;
@@ -298,6 +329,17 @@ const GameLogPage: React.FC = () => {
   const clearLogs = () => setLogs([]);
 
   const revealRawLogFile = async () => {
+    if (instanceId) {
+      const res = await InstanceService.retrieveInstanceSubdirPath(
+        instanceId,
+        InstanceSubdirType.Root
+      );
+      if (res.status === "success") {
+        await revealItemInDir(await join(res.data, "logs", "latest.log"));
+      }
+      return;
+    }
+
     if (!launchingIdRef.current) return;
 
     const baseDir = await appLogDir();
@@ -358,56 +400,87 @@ const GameLogPage: React.FC = () => {
       display="flex"
       flexDirection="column"
     >
-      <Flex alignItems="center" mb={4}>
+      <Flex alignItems="center" mb={4} gap={2} flexWrap="wrap">
+        {instanceId && (
+          <Tooltip label={t("General.previous")} placement="bottom">
+            <IconButton
+              icon={<LuArrowLeft />}
+              aria-label={t("General.previous")}
+              variant="ghost"
+              size="sm"
+              colorScheme="gray"
+              onClick={() =>
+                router.push({
+                  pathname: "/instances/details/[id]/settings",
+                  query: { id: instanceId },
+                })
+              }
+            />
+          </Tooltip>
+        )}
         <Input
           type="text"
           placeholder={t("GameLogPage.placeholder")}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           size="sm"
-          w="200px"
-          mr={4}
+          flex="1 1 180px"
+          minW={0}
           focusBorderColor={`${primaryColor}.500`}
         />
-        <Spacer />
-
-        {levels.map((level) => (
-          <Button
-            key={level}
-            size="xs"
-            variant={filterStates[level] ? "solid" : "outline"}
-            onClick={() =>
-              setFilterStates({
-                ...filterStates,
-                [level]: !filterStates[level],
-              })
-            }
-            mr={2}
-            colorScheme={logLevelMap[level].colorScheme}
-          >
-            {level} ({logCounts[level] || 0})
-          </Button>
-        ))}
-        <Tooltip label={t("GameLogPage.revealRawLog")} placement="bottom">
-          <IconButton
-            icon={<LuFileInput />}
-            aria-label={t("GameLogPage.revealRawLog")}
-            variant="ghost"
-            size="sm"
-            colorScheme="gray"
-            onClick={revealRawLogFile}
-          />
-        </Tooltip>
-        <Tooltip label={t("GameLogPage.clearLogs")} placement="bottom">
-          <IconButton
-            icon={<LuTrash />}
-            aria-label={t("GameLogPage.clearLogs")}
-            variant="ghost"
-            size="sm"
-            colorScheme="gray"
-            onClick={clearLogs}
-          />
-        </Tooltip>
+        <Flex gap={2} flex="0 1 auto" flexWrap="wrap" alignItems="center">
+          {levels.map((level) => (
+            <Button
+              key={level}
+              size="xs"
+              variant={filterStates[level] ? "solid" : "outline"}
+              onClick={() =>
+                setFilterStates({
+                  ...filterStates,
+                  [level]: !filterStates[level],
+                })
+              }
+              colorScheme={logLevelMap[level].colorScheme}
+            >
+              {level} ({logCounts[level] || 0})
+            </Button>
+          ))}
+          <Tooltip label={t("GameLogPage.revealRawLog")} placement="bottom">
+            <IconButton
+              icon={<LuFileInput />}
+              aria-label={t("GameLogPage.revealRawLog")}
+              variant="ghost"
+              size="sm"
+              colorScheme="gray"
+              onClick={revealRawLogFile}
+            />
+          </Tooltip>
+          {!instanceId && (
+            <Tooltip label={t("GameLogPage.clearLogs")} placement="bottom">
+              <IconButton
+                icon={<LuTrash />}
+                aria-label={t("GameLogPage.clearLogs")}
+                variant="ghost"
+                size="sm"
+                colorScheme="gray"
+                onClick={clearLogs}
+              />
+            </Tooltip>
+          )}
+          {instanceId && (
+            <Tooltip label={t("General.copy.text")} placement="bottom">
+              <IconButton
+                icon={<LuCopy />}
+                aria-label={t("General.copy.text")}
+                variant="ghost"
+                size="sm"
+                colorScheme="gray"
+                isDisabled={logs.length === 0}
+                onClick={() => copyText(logs.join("\n"), { toast })}
+              />
+            </Tooltip>
+          )}
+        </Flex>
       </Flex>
 
       <Box flex="1" borderWidth="1px" borderRadius="md" position="relative">

@@ -12,6 +12,7 @@ import {
 import { useRouter } from "next/router";
 import { useCallback } from "react";
 import { Trans, useTranslation } from "react-i18next";
+import { LuScrollText } from "react-icons/lu";
 import { ChakraColorSelectPopover } from "@/components/chakra-color-selector";
 import Editable from "@/components/common/editable";
 import {
@@ -169,6 +170,25 @@ const InstanceSettingsPage = () => {
                 handleUpdateInstanceConfig("starred", event.target.checked);
               }}
             />
+          ),
+        },
+        {
+          title: t("Tauri.windowTitle.gameLog"),
+          children: (
+            <Button
+              leftIcon={<LuScrollText />}
+              size="xs"
+              variant="outline"
+              onClick={() => {
+                if (!instanceId) return;
+                router.push({
+                  pathname: "/instances/details/[id]/settings/logs",
+                  query: { id: instanceId },
+                });
+              }}
+            >
+              {t("General.open")}
+            </Button>
           ),
         },
       ],
