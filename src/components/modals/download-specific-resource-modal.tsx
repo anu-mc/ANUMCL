@@ -119,6 +119,9 @@ const DownloadSpecificResourceModal: React.FC<
   );
   const [selectedItem, setSelectedItem] =
     useState<OtherResourceFileInfo | null>(null);
+  const [installableInstances, setInstallableInstances] = useState<
+    InstanceSummary[]
+  >([]);
 
   const { getGameVersionList, isGameVersionListLoading, getInstanceList } =
     useGlobalData();
@@ -639,6 +642,12 @@ const DownloadSpecificResourceModal: React.FC<
     );
   }, [modalProps.isOpen, getRecommendedFiles]);
 
+  useEffect(() => {
+    if (!isInstanceSelectorPopoverOpen) return;
+    const instances = getInstanceList();
+    if (instances) setInstallableInstances(instances);
+  }, [getInstanceList, isInstanceSelectorPopoverOpen]);
+
   return (
     <Modal
       scrollBehavior="inside"
@@ -863,7 +872,7 @@ const DownloadSpecificResourceModal: React.FC<
               <PopoverContent maxH="xs" overflow="auto">
                 <PopoverBody p={0}>
                   <InstancesView
-                    instances={getInstanceList() || []}
+                    instances={installableInstances}
                     selectedInstance={undefined}
                     viewType="list"
                     withMenu={false}

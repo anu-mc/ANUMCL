@@ -1254,7 +1254,10 @@ pub async fn create_instance(
     let path = PathBuf::from(modpack_path);
     let file = fs::File::open(&path).map_err(|_| InstanceError::FileNotFoundError)?;
     task_params.extend(get_download_params(&app, &file, &version_path).await?);
-    extract_overrides(&file, &version_path)?;
+    let extraction_path = version_path.clone();
+    tokio::task::spawn_blocking(move || extract_overrides(&file, &extraction_path))
+      .await
+      .map_err(|_| InstanceError::FileOperationError)??;
   }
 
   schedule_progressive_task_group(

@@ -70,14 +70,17 @@ export const GameVersionSelector: React.FC<GameVersionSelectorProps> = ({
   const [searchText, setSearchText] = useState("");
   const [mounted, setMounted] = useState(false);
 
-  const getGameVersionListWrapper = useCallback(() => {
-    getGameVersionList(true)
-      .then((data) => {
-        if (data === GetStateFlag.Cancelled) return;
-        setVersions(data || []);
-      })
-      .catch((e) => setVersions([] as GameClientResourceInfo[]));
-  }, [getGameVersionList]);
+  const getGameVersionListWrapper = useCallback(
+    (sync = false) => {
+      getGameVersionList(sync)
+        .then((data) => {
+          if (data === GetStateFlag.Cancelled) return;
+          setVersions(data || []);
+        })
+        .catch((e) => setVersions([] as GameClientResourceInfo[]));
+    },
+    [getGameVersionList]
+  );
 
   useEffect(() => {
     if (!mounted) {
@@ -220,7 +223,7 @@ export const GameVersionSelector: React.FC<GameVersionSelectorProps> = ({
         <IconButton
           aria-label="refresh"
           icon={<Icon as={LuRefreshCcw} boxSize={3.5} />}
-          onClick={getGameVersionListWrapper}
+          onClick={() => getGameVersionListWrapper(true)}
           size="xs"
           variant="ghost"
           colorScheme="gray"
