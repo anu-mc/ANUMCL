@@ -434,92 +434,96 @@ export const TaskContextProvider: React.FC<{ children: React.ReactNode }> = ({
             return task;
           });
 
-          const { name, params } = parseTaskGroup(payload.taskGroup);
+          // Keep notifications and follow-up commands outside the state
+          // updater. React may run updater functions more than once.
+          setTimeout(() => {
+            const { name, params } = parseTaskGroup(payload.taskGroup);
 
-          toast({
-            status:
-              payload.event === GTaskEventStatusEnums.Failed
-                ? "error"
-                : "success",
-            title: t(
-              `Services.task.onTaskGroupUpdate.status.${payload.event}`,
-              {
-                param: t(`DownloadTasksPage.task.${name}`, params),
-              }
-            ),
-          });
-
-          if (payload.event === GTaskEventStatusEnums.Completed) {
-            switch (name) {
-              case "game-client":
-              case "change-mod-loader":
-                getInstanceList(true);
-                break;
-              case "change-optifine":
-                getInstanceList(true);
-                break;
-              case "game-client-w-java":
-                getInstanceList(true);
-                getJavaInfos(true);
-                break;
-              case "forge-libraries":
-              case "neoforge-libraries":
-                if (params.param || params.param1) {
-                  const instanceId = params.param || params.param1;
-                  let instanceName = getInstanceList()?.find(
-                    (i) => i.id === instanceId
-                  )?.name;
-                  if (modLoaderLoadingToastRef.current) return newTasks;
-                  modLoaderLoadingToastRef.current = toast({
-                    title: t(
-                      "Services.instance.finishModLoaderInstall.loading",
-                      {
-                        instanceName,
-                      }
-                    ),
-                    status: "loading",
-                  });
-                  InstanceService.finishModLoaderInstall(instanceId).then(
-                    (response) => {
-                      if (modLoaderLoadingToastRef.current) {
-                        closeToast(modLoaderLoadingToastRef.current);
-                        modLoaderLoadingToastRef.current = null;
-                      }
-                      if (response.status === "success") {
-                        getInstanceList(true);
-                        toast({
-                          title: response.message,
-                          status: "success",
-                        });
-                      } else {
-                        toast({
-                          title: response.message,
-                          description: response.details,
-                          status: "error",
-                        });
-                      }
-                    }
-                  );
+            toast({
+              status:
+                payload.event === GTaskEventStatusEnums.Failed
+                  ? "error"
+                  : "success",
+              title: t(
+                `Services.task.onTaskGroupUpdate.status.${payload.event}`,
+                {
+                  param: t(`DownloadTasksPage.task.${name}`, params),
                 }
-                break;
-              case "optifine-libraries":
-                if (params.param || params.param1) {
-                  const instanceId = params.param || params.param1;
-                  let instanceName = getInstanceList()?.find(
-                    (i) => i.id === instanceId
-                  )?.name;
-                  if (optifineLoadingToastRef.current) return newTasks;
-                  optifineLoadingToastRef.current = toast({
-                    title: t(
-                      "Services.instance.finishOptiFineLoaderInstall.loading",
-                      {
-                        instanceName,
+              ),
+            });
+
+            if (payload.event === GTaskEventStatusEnums.Completed) {
+              switch (name) {
+                case "game-client":
+                case "change-mod-loader":
+                  getInstanceList(true);
+                  break;
+                case "change-optifine":
+                  getInstanceList(true);
+                  break;
+                case "game-client-w-java":
+                  getInstanceList(true);
+                  getJavaInfos(true);
+                  break;
+                case "forge-libraries":
+                case "neoforge-libraries":
+                  if (params.param || params.param1) {
+                    const instanceId = params.param || params.param1;
+                    let instanceName = getInstanceList()?.find(
+                      (i) => i.id === instanceId
+                    )?.name;
+                    if (modLoaderLoadingToastRef.current) return newTasks;
+                    modLoaderLoadingToastRef.current = toast({
+                      title: t(
+                        "Services.instance.finishModLoaderInstall.loading",
+                        {
+                          instanceName,
+                        }
+                      ),
+                      status: "loading",
+                    });
+                    InstanceService.finishModLoaderInstall(instanceId).then(
+                      (response) => {
+                        if (modLoaderLoadingToastRef.current) {
+                          closeToast(modLoaderLoadingToastRef.current);
+                          modLoaderLoadingToastRef.current = null;
+                        }
+                        if (response.status === "success") {
+                          getInstanceList(true);
+                          toast({
+                            title: response.message,
+                            status: "success",
+                          });
+                        } else {
+                          toast({
+                            title: response.message,
+                            description: response.details,
+                            status: "error",
+                          });
+                        }
                       }
-                    ),
-                    status: "loading",
-                  });
-                  InstanceService.finishOptiFineLoaderInstall(instanceId).then(
-                    (response) => {
+                    );
+                  }
+                  break;
+                case "optifine-libraries":
+                  if (params.param || params.param1) {
+                    const instanceId = params.param || params.param1;
+                    let instanceName = getInstanceList()?.find(
+                      (i) => i.id === instanceId
+                    )?.name;
+                    if (optifineLoadingToastRef.current) return newTasks;
+                    optifineLoadingToastRef.current = toast({
+                      title: t(
+                        "Services.instance.finishOptiFineLoaderInstall.loading",
+                        {
+                          instanceName,
+                        }
+                      ),
+                      status: "loading",
+                    });
+                    InstanceService.finishOptiFineLoaderInstall(
+                      instanceId
+                    ).then((response) => {
                       if (optifineLoadingToastRef.current) {
                         closeToast(optifineLoadingToastRef.current);
                         optifineLoadingToastRef.current = null;
@@ -537,138 +541,140 @@ export const TaskContextProvider: React.FC<{ children: React.ReactNode }> = ({
                           status: "error",
                         });
                       }
-                    }
+                    });
+                  }
+                  break;
+                case "mod":
+                case "mod-update":
+                  emit(RESOURCE_REFRESH_EVENT, OtherResourceType.Mod);
+                  break;
+                case "resourcepack":
+                  emit(RESOURCE_REFRESH_EVENT, OtherResourceType.ResourcePack);
+                  break;
+                case "shader":
+                  emit(RESOURCE_REFRESH_EVENT, OtherResourceType.ShaderPack);
+                  break;
+                case "modpack": {
+                  let group = newTasks.find(
+                    (t) => t.taskGroup === payload.taskGroup
                   );
+                  if (group && group.taskDescs.length > 0) {
+                    openSharedModal("import-modpack", {
+                      path: group.taskDescs[0].payload.dest,
+                    });
+                  }
+                  break;
                 }
-                break;
-              case "mod":
-              case "mod-update":
-                emit(RESOURCE_REFRESH_EVENT, OtherResourceType.Mod);
-                break;
-              case "resourcepack":
-                emit(RESOURCE_REFRESH_EVENT, OtherResourceType.ResourcePack);
-                break;
-              case "shader":
-                emit(RESOURCE_REFRESH_EVENT, OtherResourceType.ShaderPack);
-                break;
-              case "modpack": {
-                let group = newTasks.find(
-                  (t) => t.taskGroup === payload.taskGroup
-                );
-                if (group && group.taskDescs.length > 0) {
-                  openSharedModal("import-modpack", {
-                    path: group.taskDescs[0].payload.dest,
-                  });
+                case "ahnumc-server": {
+                  let group = newTasks.find(
+                    (t) => t.taskGroup === payload.taskGroup
+                  );
+                  if (group && group.taskDescs.length > 0) {
+                    openSharedModal("import-modpack", {
+                      path: group.taskDescs[0].payload.dest,
+                    });
+                  }
+                  break;
                 }
-                break;
-              }
-              case "ahnumc-server": {
-                let group = newTasks.find(
-                  (t) => t.taskGroup === payload.taskGroup
-                );
-                if (group && group.taskDescs.length > 0) {
-                  openSharedModal("import-modpack", {
-                    path: group.taskDescs[0].payload.dest,
-                  });
+                case "launcher-update": {
+                  let group = newTasks.find(
+                    (t) => t.taskGroup === payload.taskGroup
+                  );
+                  if (group && group.taskDescs.length > 0) {
+                    const isWinInstaller =
+                      config.basicInfo.osType === "windows" &&
+                      !config.basicInfo.isPortable;
+                    openGenericConfirmDialog({
+                      title: t("RestartForUpdateConfirmDialog.title"),
+                      body: t(
+                        `RestartForUpdateConfirmDialog.${isWinInstaller ? "bodyWinInstaller" : "body"}`
+                      ),
+                      btnOK: t(
+                        `RestartForUpdateConfirmDialog.button.${isWinInstaller ? "install" : "restart"}`
+                      ),
+                      btnCancel: t(
+                        "RestartForUpdateConfirmDialog.button.later"
+                      ),
+                      onOKCallback: () => {
+                        ConfigService.installLauncherUpdate(
+                          group.taskDescs[0].payload.filename || "",
+                          true
+                        ).then((response) => {
+                          if (response.status !== "success") {
+                            toast({
+                              title: response.message,
+                              description: response.details,
+                              status: "error",
+                            });
+                          }
+                        });
+                      },
+                      onCancelCallback: () => {
+                        ConfigService.installLauncherUpdate(
+                          group.taskDescs[0].payload.filename || "",
+                          false
+                        ).then((response) => {
+                          if (response.status !== "success") {
+                            toast({
+                              title: response.message,
+                              description: response.details,
+                              status: "error",
+                            });
+                          }
+                        });
+                      },
+                    });
+                  }
+                  break;
                 }
-                break;
-              }
-              case "launcher-update": {
-                let group = newTasks.find(
-                  (t) => t.taskGroup === payload.taskGroup
-                );
-                if (group && group.taskDescs.length > 0) {
-                  const isWinInstaller =
-                    config.basicInfo.osType === "windows" &&
-                    !config.basicInfo.isPortable;
-                  openGenericConfirmDialog({
-                    title: t("RestartForUpdateConfirmDialog.title"),
-                    body: t(
-                      `RestartForUpdateConfirmDialog.${isWinInstaller ? "bodyWinInstaller" : "body"}`
-                    ),
-                    btnOK: t(
-                      `RestartForUpdateConfirmDialog.button.${isWinInstaller ? "install" : "restart"}`
-                    ),
-                    btnCancel: t("RestartForUpdateConfirmDialog.button.later"),
-                    onOKCallback: () => {
-                      ConfigService.installLauncherUpdate(
-                        group.taskDescs[0].payload.filename || "",
-                        true
-                      ).then((response) => {
-                        if (response.status !== "success") {
-                          toast({
-                            title: response.message,
-                            description: response.details,
-                            status: "error",
-                          });
-                        }
-                      });
-                    },
-                    onCancelCallback: () => {
-                      ConfigService.installLauncherUpdate(
-                        group.taskDescs[0].payload.filename || "",
-                        false
-                      ).then((response) => {
-                        if (response.status !== "success") {
-                          toast({
-                            title: response.message,
-                            description: response.details,
-                            status: "error",
-                          });
-                        }
-                      });
-                    },
-                  });
-                }
-                break;
-              }
-              case "extension-update": {
-                let group = newTasks.find(
-                  (t) => t.taskGroup === payload.taskGroup
-                );
-                const task = group?.taskDescs[0];
-                const expectedIdentifier = params.param1;
-                const newVersion = params.param2 || "";
+                case "extension-update": {
+                  let group = newTasks.find(
+                    (t) => t.taskGroup === payload.taskGroup
+                  );
+                  const task = group?.taskDescs[0];
+                  const expectedIdentifier = params.param1;
+                  const newVersion = params.param2 || "";
 
-                if (task && expectedIdentifier) {
-                  openGenericConfirmDialog({
-                    title: t("ExtensionUpdateConfirmDialog.title"),
-                    body: t("ExtensionUpdateConfirmDialog.body", {
-                      identifier: expectedIdentifier,
-                      version: newVersion,
-                      src: task.payload.src,
-                    }),
-                    onOKCallback: () => {
-                      ExtensionService.addExtension(
-                        task.payload.dest,
-                        expectedIdentifier
-                      ).then((response) => {
-                        if (response.status === "success") {
-                          toast({
-                            title: response.message,
-                            status: "success",
-                          });
-                          emit(EXTENSION_REFRESH_EVENT);
-                        } else {
-                          toast({
-                            title: response.message,
-                            description: response.details,
-                            status: "error",
-                          });
-                        }
-                      });
-                    },
-                  });
+                  if (task && expectedIdentifier) {
+                    openGenericConfirmDialog({
+                      title: t("ExtensionUpdateConfirmDialog.title"),
+                      body: t("ExtensionUpdateConfirmDialog.body", {
+                        identifier: expectedIdentifier,
+                        version: newVersion,
+                        src: task.payload.src,
+                      }),
+                      onOKCallback: () => {
+                        ExtensionService.addExtension(
+                          task.payload.dest,
+                          expectedIdentifier
+                        ).then((response) => {
+                          if (response.status === "success") {
+                            toast({
+                              title: response.message,
+                              status: "success",
+                            });
+                            emit(EXTENSION_REFRESH_EVENT);
+                          } else {
+                            toast({
+                              title: response.message,
+                              description: response.details,
+                              status: "error",
+                            });
+                          }
+                        });
+                      },
+                    });
+                  }
+                  break;
                 }
-                break;
+                case "mojang-java":
+                  getJavaInfos(true);
+                  break;
+                default:
+                  break;
               }
-              case "mojang-java":
-                getJavaInfos(true);
-                break;
-              default:
-                break;
             }
-          }
+          }, 0);
 
           return newTasks;
         });
