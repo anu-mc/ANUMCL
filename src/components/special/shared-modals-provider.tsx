@@ -1,3 +1,4 @@
+import React from "react";
 import DownloadSpecificResourceModal from "@/components//modals/download-specific-resource-modal";
 import AddAuthServerModal from "@/components/modals/add-auth-server-modal";
 import AlertResourceDependencyModal from "@/components/modals/alert-resource-dependency-modal";
@@ -15,6 +16,46 @@ import SpotlightSearchModal from "@/components/modals/spotlight-search-modal";
 import { SharedModalContextProvider } from "@/contexts/shared-modal";
 import { useSharedModals } from "@/contexts/shared-modal";
 
+const modals: Record<string, React.FC<any>> = {
+  "add-auth-server": AddAuthServerModal,
+  "alert-resource-dependency": AlertResourceDependencyModal,
+  "copy-or-move": CopyOrMoveModal,
+  "delete-instance-alert": DeleteInstanceDialog,
+  "download-modpack": DownloadModpackModal,
+  "download-resource": DownloadResourceModal,
+  "download-specific-resource": DownloadSpecificResourceModal,
+  "extension-info": ExtensionInfoModal,
+  "generic-confirm": GenericConfirmDialog,
+  "import-modpack": ImportModpackModal,
+  launch: LaunchProcessModal,
+  "notify-new-version": NotifyNewVersionModal,
+  relogin: ReLoginPlayerModal,
+  "spotlight-search": SpotlightSearchModal,
+};
+
+const SharedModalEntry = React.memo<{
+  state: { isOpen: boolean; params: any; modalKey: string; order: number };
+  close: (key: string) => void;
+  isTop: boolean;
+}>(({ state, close, isTop }) => {
+  const SpecModal = modals[state.modalKey];
+  if (!SpecModal) return null;
+
+  return (
+    <SpecModal
+      isOpen={state.isOpen}
+      {...state.params}
+      zIndex={1400 + state.order}
+      trapFocus={isTop}
+      closeOnEsc={isTop}
+      closeOnOverlayClick={isTop}
+      blockScrollOnMount={isTop}
+      onClose={() => close(state.modalKey)}
+    />
+  );
+});
+SharedModalEntry.displayName = "SharedModalEntry";
+
 const SharedModalsProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
@@ -30,45 +71,28 @@ const SharedModals: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const { modalStates, closeSharedModal } = useSharedModals();
 
-  const modals: Record<string, React.FC<any>> = {
-    "add-auth-server": AddAuthServerModal,
-    "alert-resource-dependency": AlertResourceDependencyModal,
-    "copy-or-move": CopyOrMoveModal,
-    "delete-instance-alert": DeleteInstanceDialog,
-    "download-modpack": DownloadModpackModal,
-    "download-resource": DownloadResourceModal,
-    "download-specific-resource": DownloadSpecificResourceModal,
-    "extension-info": ExtensionInfoModal,
-    "generic-confirm": GenericConfirmDialog,
-    "import-modpack": ImportModpackModal,
-    launch: LaunchProcessModal,
-    "notify-new-version": NotifyNewVersionModal,
-    relogin: ReLoginPlayerModal,
-    "spotlight-search": SpotlightSearchModal,
-  };
-
   return (
     <>
       {children}
 
-      {Object.keys(modals)
-        .filter((key) => modalStates[key])
-        .sort(
-          (a, b) => (modalStates[a]._order || 0) - (modalStates[b]._order || 0)
-        )
-        .map((key) => {
-          const { _order: _, ...modalParams } = modalStates[key];
-          if (!modalParams) return null;
-
-          const SpecModal = modals[key];
-          return (
-            <SpecModal
-              key={key}
-              {...modalParams}
-              onClose={() => closeSharedModal(key)}
-            />
-          );
-        })}
+      {(() => {
+        const topEntry = Object.entries(modalStates).reduce<
+          [string, (typeof modalStates)[string]] | undefined
+        >((current, entry) => {
+          if (!current || entry[1].order > current[1].order) return entry;
+          return current;
+        }, undefined);
+        if (!topEntry) return null;
+        const [instanceKey, state] = topEntry;
+        return (
+          <SharedModalEntry
+            key={instanceKey}
+            state={state}
+            close={closeSharedModal}
+            isTop
+          />
+        );
+      })()}
     </>
   );
 };
