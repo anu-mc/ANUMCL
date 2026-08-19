@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use std::time::Duration;
+use std::time::{Duration, Instant};
 use tauri::AppHandle;
 
 use crate::tasks::streams::desc::PDesc;
@@ -25,6 +25,8 @@ pub trait Sink {
 pub struct Reporter<S: Sink> {
   total: i64,
   last_reported: i64,
+  last_report_at: Instant,
+  smoothed_speed: f64,
   interval: Duration,
   sink: S,
 }
@@ -37,6 +39,8 @@ where
     Self {
       total,
       last_reported: 0,
+      last_report_at: Instant::now(),
+      smoothed_speed: 0.0,
       interval,
       sink,
     }
@@ -48,6 +52,8 @@ where
 
   pub fn reset_progress(&mut self) {
     self.last_reported = 0;
+    self.last_report_at = Instant::now();
+    self.smoothed_speed = 0.0;
   }
 
   pub fn from_desc_interval<T: Clone + Serialize + for<'de> Deserialize<'de>>(
@@ -58,6 +64,8 @@ where
     Self {
       total: desc.total,
       last_reported: desc.current,
+      last_report_at: Instant::now(),
+      smoothed_speed: 0.0,
       interval: *interval,
       sink,
     }
@@ -85,6 +93,11 @@ where
   }
 
   pub fn report_progress(&mut self, task_id: u32, task_group: Option<&str>, current: i64) {
+    let elapsed = self
+      .last_report_at
+      .elapsed()
+      .max(self.interval)
+      .as_secs_f64();
     let percentage = if self.total > 0 {
       (current as f64 / self.total as f64 * 100.0).round() as u32
     } else {
@@ -92,15 +105,19 @@ where
     };
 
     let estimated_time = if self.last_reported > 0 && current > self.last_reported {
-      Some(
-        (self.total - current) as f64 / (current - self.last_reported) as f64
-          * self.interval.as_secs_f64(),
-      )
+      Some((self.total - current) as f64 / (current - self.last_reported) as f64 * elapsed)
     } else {
       None
     };
 
-    let speed = (current - self.last_reported) as f64 / self.interval.as_secs_f64();
+    let sample_speed = (current - self.last_reported).max(0) as f64 / elapsed;
+    // Smooth bursty chunk arrivals so the UI does not report stale, peak
+    // samples that make several tasks appear to exceed the link capacity.
+    self.smoothed_speed = if self.smoothed_speed == 0.0 {
+      sample_speed
+    } else {
+      self.smoothed_speed * 0.75 + sample_speed * 0.25
+    };
 
     self.sink.report_progress(
       task_id,
@@ -109,10 +126,11 @@ where
       self.total,
       percentage,
       estimated_time,
-      speed,
+      self.smoothed_speed,
     );
 
     self.last_reported = current;
+    self.last_report_at = Instant::now();
   }
 
   pub fn report_failed(&self, task_id: u32, task_group: Option<&str>, reason: String) {
