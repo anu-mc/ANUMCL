@@ -14,15 +14,14 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { join } from "@tauri-apps/api/path";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { LuDownload, LuRefreshCw, LuServer } from "react-icons/lu";
 import { Section } from "@/components/common/section";
 import { useLauncherConfig } from "@/contexts/config";
-import { useSharedModals } from "@/contexts/shared-modal";
 import { useToast } from "@/contexts/toast";
 import { AhnumcServer, AhnumcServerManifest } from "@/models/ahnumc-server";
-import { GTaskEventStatusEnums, TaskTypeEnums } from "@/models/task";
+import { TaskTypeEnums } from "@/models/task";
 import { AhnumcServerService } from "@/services/ahnumc-server";
 import { TaskService } from "@/services/task";
 import { sanitizeFileName } from "@/utils/string";
@@ -30,13 +29,11 @@ import { sanitizeFileName } from "@/utils/string";
 const AhnumcServersPage = () => {
   const { t } = useTranslation();
   const { config } = useLauncherConfig();
-  const { openSharedModal } = useSharedModals();
   const toast = useToast();
   const primaryColor = config.appearance.theme.primaryColor;
   const [servers, setServers] = useState<AhnumcServer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
-  const pendingDownloads = useRef<Record<string, string>>({});
 
   const fetchServers = useCallback(() => {
     setIsLoading(true);
@@ -63,17 +60,6 @@ const AhnumcServersPage = () => {
   useEffect(() => {
     fetchServers();
   }, [fetchServers]);
-
-  useEffect(() => {
-    const unlisten = TaskService.onTaskGroupUpdate((payload) => {
-      if (payload.event !== GTaskEventStatusEnums.Completed) return;
-      const path = pendingDownloads.current[payload.taskGroup];
-      if (!path) return;
-      delete pendingDownloads.current[payload.taskGroup];
-      openSharedModal("import-modpack", { path });
-    });
-    return () => unlisten();
-  }, [openSharedModal]);
 
   const handleInstall = async (server: AhnumcServer) => {
     const cacheDir = config.download.cache.directory.trim();
@@ -108,7 +94,6 @@ const AhnumcServersPage = () => {
       return;
     }
 
-    pendingDownloads.current[response.data.taskGroup] = destination;
     toast({
       title: t("AhnumcServersPage.downloadStarted", { name: server.name }),
       status: "success",

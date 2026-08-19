@@ -118,10 +118,6 @@
       "server": {
         "title": "下载服务端",
         "description": "下载各版本原版游戏服务端文件"
-      },
-      "ahnumcServers": {
-        "title": "AHNUMC 服务器",
-        "description": "浏览 AHNUMC 服务器并安装客户端整合包"
       }
     }
   },
@@ -528,6 +524,7 @@
   "DiscoverLayout": {
     "discoverDomainList": {
       "search": "搜索",
+      "ahnumc-servers": "AHNUMC 服务器",
       "home": "主页",
       "community-news": "社区新闻",
       "minecraft-news": "Minecraft 新闻",
@@ -584,7 +581,11 @@
       "title": "GitHub 下载镜像",
       "autoSelect": "自动选择最快镜像",
       "autoSelectDescription": "下载 GitHub 资源时自动测速并选择最快站点",
-      "mirror": { "title": "首选镜像", "auto": "自动测速", "official": "GitHub 官方直连" },
+      "mirror": {
+        "title": "首选镜像",
+        "auto": "自动测速",
+        "official": "GitHub 官方直连"
+      },
       "test": "测速并使用最快镜像",
       "testFailed": "所有镜像均不可用"
     },

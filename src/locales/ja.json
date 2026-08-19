@@ -118,10 +118,6 @@
       "server": {
         "title": "サーバーダウンロード",
         "description": "各バージョンのヴァニラサーバーファイルをダウンロード"
-      },
-      "ahnumcServers": {
-        "title": "AHNUMC サーバー",
-        "description": "AHNUMC サーバーを閲覧してクライアントModパックをインストール"
       }
     }
   },
@@ -528,6 +524,7 @@
   "DiscoverLayout": {
     "discoverDomainList": {
       "search": "検索",
+      "ahnumc-servers": "AHNUMC サーバー",
       "home": "ホーム",
       "community-news": "コミュニティ",
       "minecraft-news": "Minecraft ニュース",
@@ -584,7 +581,11 @@
       "title": "GitHub ダウンロードミラー",
       "autoSelect": "最速ミラーを自動選択",
       "autoSelectDescription": "GitHub リソースのダウンロード時にミラーを測定",
-      "mirror": { "title": "優先ミラー", "auto": "自動", "official": "GitHub 直接" },
+      "mirror": {
+        "title": "優先ミラー",
+        "auto": "自動",
+        "official": "GitHub 直接"
+      },
       "test": "最速ミラーを測定",
       "testFailed": "利用可能なミラーがありません"
     },

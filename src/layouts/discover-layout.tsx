@@ -21,6 +21,7 @@ import {
   LuPackage,
   LuPuzzle,
   LuSearch,
+  LuServer,
   LuSquareLibrary,
 } from "react-icons/lu";
 import NavMenu, { MenuItem } from "@/components/common/nav-menu";
@@ -65,6 +66,13 @@ const DiscoverLayout: React.FC<{ children: React.ReactNode }> = ({
         key: "community-news",
         icon: LuMessagesSquare,
         route: "/discover/community-news",
+      },
+    ],
+    [
+      {
+        key: "ahnumc-servers",
+        icon: LuServer,
+        route: "/discover/servers",
       },
     ],
     [

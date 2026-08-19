@@ -118,10 +118,6 @@
       "server": {
         "title": "引伺服端",
         "description": "引諸版之官式伺服端案。"
-      },
-      "ahnumcServers": {
-        "title": "AHNUMC 伺服器",
-        "description": "觀 AHNUMC 伺服器而置客戶改囊"
       }
     }
   },
@@ -528,6 +524,7 @@
   "DiscoverLayout": {
     "discoverDomainList": {
       "search": "尋",
+      "ahnumc-servers": "AHNUMC 伺服器",
       "home": "主葉",
       "community-news": "社聞",
       "minecraft-news": "礦藝聞",
@@ -584,7 +581,11 @@
       "title": "GitHub 下載鏡像",
       "autoSelect": "自動選擇最快鏡像",
       "autoSelectDescription": "下載 GitHub 資源時自動測試鏡像",
-      "mirror": { "title": "首選鏡像", "auto": "自動", "official": "GitHub 直連" },
+      "mirror": {
+        "title": "首選鏡像",
+        "auto": "自動",
+        "official": "GitHub 直連"
+      },
       "test": "測試最快鏡像",
       "testFailed": "無可用鏡像"
     },

@@ -74,7 +74,6 @@ const AddAndImportInstancePage = () => {
 
   const moreOptions: Record<string, () => void> = {
     server: onOpenDownloadGameServerModal,
-    ahnumcServers: () => router.push("/instances/servers"),
   };
 
   const modpackOperations = [

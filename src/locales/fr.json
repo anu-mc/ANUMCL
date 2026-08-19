@@ -118,10 +118,6 @@
       "server": {
         "title": "Télécharger le serveur",
         "description": "Télécharger les fichiers serveur de toutes les versions officielles du jeu"
-      },
-      "ahnumcServers": {
-        "title": "Serveurs AHNUMC",
-        "description": "Parcourir les serveurs AHNUMC et installer les modpacks client"
       }
     }
   },
@@ -528,6 +524,7 @@
   "DiscoverLayout": {
     "discoverDomainList": {
       "search": "Recherche",
+      "ahnumc-servers": "Serveurs AHNUMC",
       "home": "Accueil",
       "community-news": "Communauté",
       "minecraft-news": "Actualités Minecraft",
@@ -584,7 +581,11 @@
       "title": "Miroirs de téléchargement GitHub",
       "autoSelect": "Sélection automatique du plus rapide",
       "autoSelectDescription": "Tester les miroirs lors des téléchargements GitHub",
-      "mirror": { "title": "Miroir préféré", "auto": "Automatique", "official": "GitHub direct" },
+      "mirror": {
+        "title": "Miroir préféré",
+        "auto": "Automatique",
+        "official": "GitHub direct"
+      },
       "test": "Tester le miroir le plus rapide",
       "testFailed": "Aucun miroir disponible"
     },

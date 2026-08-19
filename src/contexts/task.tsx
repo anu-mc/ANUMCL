@@ -562,6 +562,17 @@ export const TaskContextProvider: React.FC<{ children: React.ReactNode }> = ({
                 }
                 break;
               }
+              case "ahnumc-server": {
+                let group = newTasks.find(
+                  (t) => t.taskGroup === payload.taskGroup
+                );
+                if (group && group.taskDescs.length > 0) {
+                  openSharedModal("import-modpack", {
+                    path: group.taskDescs[0].payload.dest,
+                  });
+                }
+                break;
+              }
               case "launcher-update": {
                 let group = newTasks.find(
                   (t) => t.taskGroup === payload.taskGroup
