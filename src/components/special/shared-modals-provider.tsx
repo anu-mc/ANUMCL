@@ -51,19 +51,24 @@ const SharedModals: React.FC<{ children: React.ReactNode }> = ({
     <>
       {children}
 
-      {Object.keys(modals).map((key) => {
-        const modalParams = modalStates[key];
-        if (!modalParams) return null;
+      {Object.keys(modals)
+        .filter((key) => modalStates[key])
+        .sort(
+          (a, b) => (modalStates[a]._order || 0) - (modalStates[b]._order || 0)
+        )
+        .map((key) => {
+          const { _order: _, ...modalParams } = modalStates[key];
+          if (!modalParams) return null;
 
-        const SpecModal = modals[key];
-        return (
-          <SpecModal
-            key={key}
-            {...modalParams}
-            onClose={() => closeSharedModal(key)}
-          />
-        );
-      })}
+          const SpecModal = modals[key];
+          return (
+            <SpecModal
+              key={key}
+              {...modalParams}
+              onClose={() => closeSharedModal(key)}
+            />
+          );
+        })}
     </>
   );
 };

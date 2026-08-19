@@ -1,4 +1,10 @@
-import React, { createContext, useCallback, useContext, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useRef,
+  useState,
+} from "react";
 import { useLauncherConfig } from "@/contexts/config";
 
 interface SharedModalContextType {
@@ -18,12 +24,14 @@ export const SharedModalContextProvider: React.FC<{
   const [modalStates, setModalStates] = useState<
     Record<string, { isOpen: boolean; params: any }>
   >({});
+  const modalOrder = useRef(0);
   const { config } = useLauncherConfig();
 
   const openSharedModal = useCallback((key: string, params: any = {}) => {
+    const order = ++modalOrder.current;
     setModalStates((prev) => ({
       ...prev,
-      [key]: { isOpen: true, ...params },
+      [key]: { isOpen: true, ...params, _order: order },
     }));
     logger.info("Opened shared modal:", key, params);
   }, []);
